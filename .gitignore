@@ -1,0 +1,61 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Data files
+*.csv
+*.json
+
+# FAISS index files
+*.faiss
+*.pkl
+faiss_index*/
+faiss_index_example/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+*.ipynb
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Project specific
+documents/
+*.pdf
+*.docx
+*.txt
+!requirements.txt
+!README.txt
+
+# Temporary files
+*.tmp
+*.bak
+*.cache
