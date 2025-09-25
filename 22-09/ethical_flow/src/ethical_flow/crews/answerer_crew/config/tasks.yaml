@@ -1,0 +1,30 @@
+web_research:
+  description: |
+    Ricerca informazioni aggiornate su internet per la seguente domanda.
+    
+    Domanda dell'utente: {user_input}
+    
+    Il tuo compito:
+    1. Identifica le informazioni chiave necessarie per rispondere
+    2. Cerca dati recenti e accurati utilizzando gli strumenti web
+    3. Verifica l'affidabilità delle fonti
+    4. Organizza le informazioni trovate in modo strutturato
+    5. Includi sempre i link alle fonti
+    
+    Non formulare una risposta finale - raccogli solo i dati.
+  expected_output: "Informazioni organizzate con fonti citate, pronte per essere elaborate"
+  agent: web_researcher
+
+final_answer:
+  description: |
+    Fornisci una risposta completa alla domanda dell'utente utilizzando le informazioni di ricerca.
+    
+    Domanda originale: {user_input}
+    
+    Utilizza le informazioni raccolte dal web_researcher (disponibili nel contesto del task precedente) per:
+    1. Analizzare le informazioni di ricerca fornite
+    2. Formula una risposta chiara e completa
+    3. Cita le fonti appropriate
+    4. Assicurati che la risposta sia comprensibile e utile
+  expected_output: "Risposta finale completa e ben strutturata con citazioni"
+  agent: answerer

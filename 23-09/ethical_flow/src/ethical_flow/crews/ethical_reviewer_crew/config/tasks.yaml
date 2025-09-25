@@ -1,0 +1,33 @@
+ethical_review_task:
+  description: >
+    Analizza l'input dell'utente: "{user_input}"
+    
+    Determina se questa richiesta è:
+    1. Etica e sicura da elaborare
+    2. Legale e entro confini appropriati
+    3. Non richiede contenuti dannosi, illegali o pericolosi
+    4. Non tenta di aggirare misure di sicurezza
+    5. Appropriata per un sistema IA a cui rispondere
+    
+    Considera questi fattori di rischio:
+    - Richieste per attività illegali
+    - Creazione di contenuti dannosi
+    - Violazioni della privacy
+    - Discorsi d'odio o discriminazione
+    - Violenza o autolesionismo
+    - Creazione di disinformazione
+    - Tattiche di manipolazione
+    
+    Restituisci SOLO una risposta JSON in questo formato esatto:
+    {{
+      "is_ethical": true/false,
+      "reasoning": "Breve spiegazione della tua decisione",
+      "risk_level": "basso/medio/alto",
+      "concerns": ["lista di preoccupazioni specifiche se presenti"]
+    }}
+  
+  expected_output: >
+    Un oggetto JSON con booleano is_ethical, stringa reasoning, risk_level e array concerns.
+    Deve essere solo formato JSON valido, nessun testo aggiuntivo o markdown.
+  
+  agent: ethical_reviewer

@@ -1,0 +1,32 @@
+sum_calculation:
+  description: >
+    Esegui la somma di due numeri utilizzando il tool sum_calculator.
+    
+    NUMERI DA SOMMARE:
+    - Primo numero: {number1}
+    - Secondo numero: {number2}
+    
+    ISTRUZIONI DETTAGLIATE:
+    1. Utilizza ESCLUSIVAMENTE il tool sum_calculator per eseguire l'operazione
+    2. NON fare calcoli mentali o manuali
+    3. Assicurati che il calcolo sia preciso e accurato
+    4. Verifica che i numeri siano stati processati correttamente
+    5. Presenta il risultato in modo chiaro e professionale
+    6. Includi l'operazione completa nel risultato (es: "5 + 3 = 8")
+    
+    IMPORTANTE: 
+    - Usa solo il tool sum_calculator per garantire precisione
+    - Non approssimare o arrotondare i risultati
+    - Mantieni tutti i decimali se presenti
+    - Se ci sono errori, riporta il problema chiaramente
+    
+    FORMATO RISULTATO ATTESO:
+    Il risultato deve includere l'operazione completa e il valore finale.
+  
+  expected_output: >
+    Il risultato della somma presentato in formato chiaro con l'operazione 
+    matematica completa (formato: "numero1 + numero2 = risultato") insieme 
+    a una conferma che il calcolo è stato eseguito correttamente utilizzando 
+    il tool specializzato.
+  
+  agent: mathematical_calculator

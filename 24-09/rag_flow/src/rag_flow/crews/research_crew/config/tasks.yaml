@@ -1,0 +1,66 @@
+research_task:
+  description: >
+    Conduci una ricerca completa su: "{research_point}"
+    
+    Nel contesto dell'argomento più ampio: "{main_topic}"
+    
+    La tua ricerca dovrebbe:
+    1. Utilizzare strumenti di ricerca web per trovare informazioni attuali e affidabili
+    2. Cercare fonti multiple per verificare i fatti
+    3. Identificare statistiche chiave, esempi e opinioni di esperti
+    4. Notare eventuali informazioni contrastanti o dibattiti
+    5. Trovare sviluppi o tendenze recenti
+    6. Raccogliere dettagli specifici, non solo informazioni generali
+    
+    Concentrati su:
+    - Fonti accademiche e autorevoli
+    - Dati e statistiche recenti
+    - Opinioni e analisi di esperti
+    - Esempi del mondo reale e casi di studio
+    - Tendenze e sviluppi attuali
+    
+    Compila i tuoi risultati in un rapporto di ricerca strutturato con:
+    - Risultati chiave
+    - Statistiche/dati importanti
+    - Citazioni o opinioni di esperti
+    - Fonti e riferimenti
+    - Eventuali punti di vista contrastanti
+
+  expected_output: >
+    Un rapporto di ricerca completo con risultati chiave, statistiche, opinioni di esperti,
+    esempi e fonti adeguatamente citate. Includi eventuali sfumature importanti o dibattiti
+    nel campo.
+
+  agent: researcher
+
+
+content_writing_task:
+  description: >
+    Utilizzando i risultati della ricerca, scrivi un paragrafo chiaro e coinvolgente su: "{research_point}"
+    
+    Il tuo paragrafo dovrebbe:
+    1. Essere lungo 150-300 parole
+    2. Iniziare con una frase argomento chiara
+    3. Includere le informazioni più importanti dalla ricerca
+    4. Incorporare statistiche o punti dati rilevanti
+    5. Menzionare prospettive di esperti quando rilevante
+    6. Essere scritto in uno stile informativo ma accessibile
+    7. Fluire logicamente da frase a frase
+    8. Terminare con un pensiero conclusivo che si collega all'argomento più ampio
+    
+    Linee guida di stile:
+    - Usa linguaggio chiaro e conciso
+    - Evita gergo a meno che necessario (poi spiegalo)
+    - Includi esempi specifici o dati quando disponibili
+    - Mantieni obiettività ed equilibrio
+    - Scrivi per un pubblico generale educato
+    
+    Il paragrafo dovrebbe essere autonomo pur collegandosi al contesto dell'argomento più ampio.
+
+  expected_output: >
+    Un paragrafo ben scritto di 150-300 parole che spiega chiaramente il punto di ricerca
+    utilizzando informazioni dai risultati della ricerca. Dovrebbe essere informativo, coinvolgente
+    e strutturato correttamente.
+
+  agent: content_writer  
+  context: [research_task]

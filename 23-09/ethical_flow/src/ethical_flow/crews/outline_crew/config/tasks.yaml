@@ -1,0 +1,66 @@
+create_outline_task:
+  description: >
+    Crea una scaletta completa per l'argomento: "{user_input}"
+    
+    La tua scaletta dovrebbe:
+    1. Scomporre l'argomento in 5-8 sezioni principali
+    2. Ogni sezione dovrebbe coprire un aspetto distinto dell'argomento
+    3. Le sezioni dovrebbero fluire logicamente dai concetti base a quelli più avanzati
+    4. Includere sottoargomenti chiave sotto ogni sezione principale
+    5. Considerare diverse prospettive e approcci all'argomento
+    6. Assicurare copertura completa senza ridondanza
+    
+    Struttura la tua risposta come JSON con questo formato:
+    {{
+      "topic": "Titolo argomento principale",
+      "outline": [
+        {{
+          "section": "Titolo Sezione 1",
+          "description": "Breve descrizione di cosa copre questa sezione",
+          "subtopics": ["Sottoargomento 1", "Sottoargomento 2", "Sottoargomento 3"]
+        }},
+        {{
+          "section": "Titolo Sezione 2", 
+          "description": "Breve descrizione",
+          "subtopics": ["Sottoargomento A", "Sottoargomento B"]
+        }}
+      ],
+      "estimated_length": "Breve valutazione dell'ampiezza del contenuto"
+    }}
+
+  expected_output: >
+    Una scaletta JSON dettagliata con argomento, array di sezioni contenenti titoli sezioni,
+    descrizioni e sottoargomenti, più una valutazione della lunghezza stimata.
+
+  agent: outline_creator
+
+bias_review_task:
+  description: >
+    Rivedi la scaletta creata per potenziali bias, preoccupazioni di accuratezza ed equilibrio.
+    
+    Analizza la scaletta dall'outline_creator per:
+    1. Bias culturali, ideologici o demografici
+    2. Prospettive importanti mancanti
+    3. Rischi di imprecisione fattuale potenziali
+    4. Sovra-rappresentazione di certi punti di vista
+    5. Argomenti sensibili che necessitano gestione attenta
+    6. Aree dove dovrebbero essere presentate prospettive multiple
+    
+    Fornisci raccomandazioni per migliorare equilibrio e accuratezza.
+    
+    Restituisci la tua analisi come JSON:
+    {{
+      "approved": true/false,
+      "bias_score": 1-10 (1=nessun bias, 10=altamente distorto),
+      "concerns": ["Lista di preoccupazioni specifiche di bias o accuratezza"],
+      "recommendations": ["Suggerimenti per migliorare l'equilibrio"],
+      "sensitive_areas": ["Argomenti che richiedono cura extra"],
+      "missing_perspectives": ["Punti di vista importanti non coperti"]
+    }}
+
+  expected_output: >
+    Un'analisi JSON con stato di approvazione, punteggio bias, preoccupazioni specifiche,
+    raccomandazioni e identificazione di aree sensibili.
+
+  agent: bias_checker
+  context: [create_outline_task]

@@ -1,0 +1,22 @@
+review_ethics:
+  description: |
+    Valuta la domanda dell'utente e stabilisci se è eticamente appropriata.
+    
+    Domanda da valutare: {user_input}
+    
+    Analizza la domanda per:
+    - Contenuti potenzialmente dannosi, inappropriati o offensivi
+    - Richieste che potrebbero violare principi etici
+    - Contenuti discriminatori o che incitano odio
+    
+    IMPORTANTE: Rispondi ESCLUSIVAMENTE con un JSON valido in questo formato:
+    {{"is_ethical": true, "reasoning": "spiegazione breve"}}
+    
+    Non aggiungere altro testo prima o dopo il JSON.
+    Se la domanda è appropriata, usa "is_ethical": true
+    Se la domanda non è appropriata, usa "is_ethical": false
+  expected_output: |
+    Un JSON valido con:
+    - is_ethical: boolean (true se appropriata, false se non appropriata)  
+    - reasoning: string con spiegazione breve della valutazione
+  agent: ethical_reviewer

@@ -1,0 +1,21 @@
+evaluate_task:
+  description: >
+    Valuta se la {question} è coerente con il contesto fornito.
+  expected_output: >
+    True/False se la {question} è coerente con il contesto
+  agent: aeronautic_expert
+
+rag_response_task:
+  description: >
+    Utilizza il sistema RAG per rispondere alla {question} basandoti sul contesto fornito.
+    DEVI utilizzare il sistema RAG per recuperare informazioni pertinenti e generare risposte accurate.
+  expected_output: >
+    Il risultato esatto dal sistema RAG che fornisce una risposta accurata alla {question} basata sul contesto.
+  agent: rag_expert
+
+doc_redaction_task:
+  description: >
+    Genera un documento in formato .md su {question} utilizzando la {response} fornita dal rag_expert.
+  expected_output: >
+    Un documento markdown ben strutturato su {question} basato sulla {response} del rag_expert.
+  agent: doc_redactor
