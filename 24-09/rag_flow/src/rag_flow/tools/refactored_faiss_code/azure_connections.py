@@ -6,7 +6,7 @@ import warnings
 from langchain.chat_models import init_chat_model
 from langchain_openai import AzureOpenAIEmbeddings
 
-from utils import Settings
+from .utils import Settings
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -14,6 +14,34 @@ SETTINGS = Settings()
 
 
 def get_azure_embedding_model(settings: Settings = SETTINGS) -> AzureOpenAIEmbeddings:
+    """
+    Initialize Azure OpenAI embedding model for document vectorization.
+    
+    Creates and configures an AzureOpenAIEmbeddings instance using environment
+    variables for Azure OpenAI service connection. This model is used for
+    converting text documents into high-dimensional vector representations.
+    
+    Parameters
+    ----------
+    settings : Settings, optional
+        Configuration settings object (default: SETTINGS global instance)
+        
+    Returns
+    -------
+    AzureOpenAIEmbeddings
+        Configured Azure OpenAI embedding model ready for text vectorization
+        
+    Environment Variables
+    --------------------
+    AZURE_EMBEDDING_MODEL : str
+        Azure deployment name for embedding model (default: "text-embedding-ada-002")
+    AZURE_OPENAI_API_KEY : str
+        API key for Azure OpenAI service authentication
+    AZURE_OPENAI_ENDPOINT : str
+        Azure OpenAI service endpoint URL
+    AZURE_API_VERSION : str
+        API version for Azure OpenAI service (default: "2023-05-15")
+    """
     return AzureOpenAIEmbeddings(
         azure_deployment=os.getenv("AZURE_EMBEDDING_MODEL", "text-embedding-ada-002"),
         model=os.getenv("AZURE_EMBEDDING_MODEL", "text-embedding-ada-002"),
@@ -27,11 +55,33 @@ def get_azure_embedding_model(settings: Settings = SETTINGS) -> AzureOpenAIEmbed
 
 def get_llm_from_lmstudio():
     """
-    Inizializza un ChatModel puntando a LM Studio (OpenAI-compatible).
-    Richiede:
-      - OPENAI_BASE_URL (es. http://localhost:1234/v1)
-      - OPENAI_API_KEY (placeholder qualsiasi, es. "not-needed")
-      - LMSTUDIO_MODEL (nome del modello caricato in LM Studio)
+    Initialize a ChatModel pointing to Azure OpenAI service.
+    
+    Creates a chat model instance configured for Azure OpenAI service using
+    environment variables. This model is used for text generation and
+    conversational AI capabilities within the RAG system.
+    
+    Returns
+    -------
+    ChatModel
+        Configured Azure OpenAI chat model instance
+        
+    Raises
+    ------
+    RuntimeError
+        If required environment variables are missing (AZURE_OPENAI_ENDPOINT,
+        AZURE_OPENAI_API_KEY, or AZURE_MODEL)
+        
+    Environment Variables
+    ---------------------
+    AZURE_OPENAI_ENDPOINT : str
+        Azure OpenAI service endpoint URL (required)
+    AZURE_OPENAI_API_KEY : str
+        API key for Azure OpenAI service authentication (required)
+    AZURE_API_VERSION : str
+        API version for Azure OpenAI service (default: "2024-12-01-preview")
+    AZURE_MODEL : str
+        Name of the Azure OpenAI model to use (required)
     """
     base_url = os.getenv("AZURE_OPENAI_ENDPOINT")
     api_key = os.getenv("AZURE_OPENAI_API_KEY")

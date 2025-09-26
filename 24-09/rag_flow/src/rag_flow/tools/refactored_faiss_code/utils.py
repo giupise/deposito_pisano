@@ -19,16 +19,52 @@ load_dotenv()
 
 @dataclass
 class Settings:
+    """
+    Configuration settings for the RAG system components.
+    
+    This dataclass contains all configurable parameters for FAISS vector store
+    persistence, text chunking, retrieval strategies, and Azure OpenAI integration.
+    Optimized for technical aeronautic documents processing.
+    
+    Attributes
+    ----------
+    persist_dir : str
+        Directory path for FAISS index persistence (default: "./faiss_db/default_aeronautics")
+    chunk_size : int
+        Size of text chunks for document splitting, optimized for technical docs (default: 1000)
+    chunk_overlap : int
+        Overlap between consecutive chunks for better continuity (default: 200)
+    search_type : str
+        Retrieval search strategy: "mmr" or "similarity" (default: "mmr")
+    k : int
+        Number of documents to retrieve for better coverage (default: 6)
+    fetch_k : int
+        Number of initial candidates for MMR algorithm (default: 20)
+    mmr_lambda : float
+        MMR lambda parameter balancing relevance vs diversity (default: 0.7)
+    hf_model_name : str
+        HuggingFace embedding model identifier (default: "sentence-transformers/all-MiniLM-L6-v2")
+    lmstudio_model_env : str
+        Model name for LM Studio environment (default: "gpt-4o")
+    azure_embedding_model : str
+        Azure OpenAI embedding model name (from env AZURE_EMBEDDING_MODEL)
+    api_version : tuple
+        Azure API version tuple (from env AZURE_API_VERSION)
+    azure_endpoint : tuple
+        Azure OpenAI endpoint tuple (from env AZURE_OPENAI_ENDPOINT)
+    api_key : str
+        Azure OpenAI API key (from env AZURE_OPENAI_API_KEY)
+    """
     # Persistenza FAISS
-    persist_dir: str = "./faiss_db/default"
-    # Text splitting
-    chunk_size: int = 800
-    chunk_overlap: int = 350
+    persist_dir: str = "./faiss_db/default_aeronautics"
+    # Text splitting - Parametri ottimizzati per documenti tecnici
+    chunk_size: int = 1000        # ✅ Chunks più grandi per più contesto
+    chunk_overlap: int = 200      # ✅ Overlap maggiore per continuità
     # Retriever (MMR)
     search_type: str = "mmr"  # "mmr" o "similarity"
-    k: int = 4  # risultati finali
-    fetch_k: int = 20  # candidati iniziali (per MMR)
-    mmr_lambda: float = 0.6  # 0 = diversificazione massima, 1 = pertinenza massima
+    k: int = 6               # ✅ Più risultati per migliore coverage
+    fetch_k: int = 20        # candidati iniziali (per MMR)
+    mmr_lambda: float = 0.7  # ✅ Più pertinenza, meno diversificazione
     # Embedding
     hf_model_name: str = "sentence-transformers/all-MiniLM-L6-v2"
     # LM Studio (OpenAI-compatible)
@@ -42,15 +78,56 @@ class Settings:
 
     def set_persist_dir_from_query(self, query: str) -> None:
         """
-        Imposta persist_dir dinamicamente basandosi sulla query.
+        Set persistence directory dynamically based on query content.
+        
+        Creates a sanitized directory name from the input query to organize
+        FAISS indices by topic or domain. Useful for maintaining separate
+        knowledge bases for different subjects.
+        
+        Parameters
+        ----------
+        query : str
+            Input query string to derive directory name from
+            
+        Returns
+        -------
+        str
+            Sanitized persistence directory path
+            
+        Notes
+        -----
+        The query is sanitized by removing special characters, replacing spaces
+        with underscores, and limiting length to avoid filesystem issues.
         """
         # Pulisci la query per renderla un nome di cartella valido
         clean_query = self._sanitize_query_for_filename(query)
         self.persist_dir = f"./faiss_db/{clean_query}"
+        return self.persist_dir
 
     def _sanitize_query_for_filename(self, query: str) -> str:
         """
-        Converte una query in un nome di file/cartella valido.
+        Convert query string into valid filename/directory name.
+        
+        Sanitizes input string by removing special characters, normalizing
+        spaces, and applying length constraints for filesystem compatibility.
+        
+        Parameters
+        ----------
+        query : str
+            Raw query string to be sanitized
+            
+        Returns
+        -------
+        str
+            Sanitized string suitable for filesystem usage
+            
+        Notes
+        -----
+        - Removes non-alphanumeric characters except spaces and hyphens
+        - Replaces spaces with underscores
+        - Limits length to 30 characters
+        - Removes consecutive underscores
+        - Returns "default" if result is empty
         """
         # Rimuovi caratteri speciali e sostituisci spazi con underscore
         clean = re.sub(r"[^\w\s-]", "", query.lower())
@@ -64,7 +141,35 @@ class Settings:
 
 def load_documents(file_paths: List[str]) -> List[Document]:
     """
-    Carica documenti da file PDF, CSV e immagini, restituendo una lista di Document.
+    Load documents from various file formats into LangChain Document objects.
+    
+    Supports multiple file formats including PDF, CSV, Markdown, text files,
+    and images. Each file is loaded using the appropriate LangChain loader
+    with content preview logging for debugging purposes.
+    
+    Parameters
+    ----------
+    file_paths : List[str]
+        List of file paths to be loaded as documents
+        
+    Returns
+    -------
+    List[Document]
+        List of LangChain Document objects containing loaded content and metadata
+        
+    Supported Formats
+    ----------------
+    - PDF: Using PyMuPDFLoader for robust PDF text extraction
+    - CSV: Using CSVLoader for structured data loading
+    - Markdown: Using UnstructuredMarkdownLoader for .md files
+    - Text: Using TextLoader for plain text files
+    - Images: Using UnstructuredImageLoader for image formats (png, jpg, jpeg, bmp, gif, tiff)
+    
+    Notes
+    -----
+    - Unsupported file types are skipped with warning messages
+    - Each document's content is previewed in logs (first 100 characters)
+    - Total document count and individual file statistics are logged
     """
     print(f"🔍 LOAD_DOCUMENTS: Caricamento di {len(file_paths)} file(s)")
     documents = []
@@ -99,12 +204,42 @@ def load_documents(file_paths: List[str]) -> List[Document]:
 
 def split_documents(docs: List[Document], settings: Settings) -> List[Document]:
     """
-    Applica uno splitting robusto ai documenti per ottimizzare il retrieval.
+    Apply robust document splitting for optimal retrieval performance.
+    
+    Splits documents into smaller chunks using RecursiveCharacterTextSplitter
+    with hierarchical separators optimized for technical documentation.
+    Maintains semantic coherence through configurable overlap.
+    
+    Parameters
+    ----------
+    docs : List[Document]
+        List of documents to be split into chunks
+    settings : Settings
+        Configuration object containing chunk_size and chunk_overlap parameters
+        
+    Returns
+    -------
+    List[Document]
+        List of document chunks with preserved metadata and optimized content boundaries
+        
+    Notes
+    -----
+    Uses hierarchical separator strategy:
+    1. Markdown headers (#, ##, ###)
+    2. Paragraph breaks (\n\n, \n)
+    3. Sentence endings (., ?, !, ;, :)
+    4. Clause separators (, )
+    5. Word boundaries ( )
+    6. Aggressive character-level fallback
+    
+    Chunk size and overlap are optimized for technical documents to ensure
+    sufficient context while maintaining computational efficiency.
     """
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=settings.chunk_size,
         chunk_overlap=settings.chunk_overlap,
         separators=[
+            "#", "##", "###",
             "\n\n",
             "\n",
             ". ",
@@ -114,7 +249,8 @@ def split_documents(docs: List[Document], settings: Settings) -> List[Document]:
             ": ",
             ", ",
             " ",
-            "",  # fallback aggressivo
+            "",
+                # fallback aggressivo
         ],
     )
     return splitter.split_documents(docs)
@@ -122,7 +258,29 @@ def split_documents(docs: List[Document], settings: Settings) -> List[Document]:
 
 def format_docs_for_prompt(docs: List[Document]) -> str:
     """
-    Prepara il contesto per il prompt, includendo citazioni [source].
+    Format retrieved documents for LLM prompt with source citations.
+    
+    Combines multiple document chunks into a single formatted string with
+    source attributions for transparency and traceability in RAG responses.
+    Each document is prefixed with its source information.
+    
+    Parameters
+    ----------
+    docs : List[Document]
+        List of retrieved Document objects to format
+        
+    Returns
+    -------
+    str
+        Formatted string containing all document contents with source citations
+        
+    Format
+    ------
+    Each document is formatted as:
+    [source:filename/path] document_content
+    
+    Documents are separated by double newlines for clear delineation.
+    Source information is extracted from document metadata or uses default naming.
     """
     lines = []
     for i, d in enumerate(docs, start=1):
@@ -133,7 +291,32 @@ def format_docs_for_prompt(docs: List[Document]) -> str:
 
 def scan_docs_folder(docs_dir: str = "docs") -> List[str]:
     """
-    Scansiona la cartella docs e restituisce tutti i file supportati.
+    Recursively scan directory for supported document formats.
+    
+    Searches through the specified directory and its subdirectories to find
+    all files with supported extensions for document loading and processing.
+    
+    Parameters
+    ----------
+    docs_dir : str, optional
+        Directory path to scan for documents (default: "docs")
+        
+    Returns
+    -------
+    List[str]
+        List of absolute file paths for all supported documents found
+        
+    Supported Extensions
+    -------------------
+    - Documents: .pdf, .csv, .md, .txt
+    - Images: .png, .jpg, .jpeg, .bmp, .gif, .tiff
+    
+    Notes
+    -----
+    - Performs recursive search through all subdirectories
+    - Returns empty list if directory doesn't exist
+    - Logs the total number of files found
+    - Case-insensitive extension matching
     """
     supported_extensions = {
         ".pdf",
@@ -165,7 +348,39 @@ def scan_docs_folder(docs_dir: str = "docs") -> List[str]:
 
 def clean_web_content(text: str) -> str:
     """
-    Pulisce il contenuto web da elementi indesiderati.
+    Clean web-scraped content by removing unwanted UI elements and noise.
+    
+    Applies comprehensive text cleaning to web-scraped content, removing
+    navigation elements, advertisements, legal notices, and formatting
+    artifacts while preserving meaningful textual information.
+    
+    Parameters
+    ----------
+    text : str
+        Raw web content text to be cleaned
+        
+    Returns
+    -------
+    str
+        Cleaned text with unwanted elements removed and normalized formatting
+        
+    Cleaning Operations
+    ------------------
+    1. Normalize whitespace and control characters
+    2. Remove common UI patterns (cookies, navigation, social media)
+    3. Remove legal notices and copyright information
+    4. Filter out URLs and email addresses
+    5. Remove timestamps and date patterns
+    6. Clean special character sequences
+    7. Filter short/meaningless lines
+    8. Remove all-caps navigation text
+    
+    Notes
+    -----
+    - Preserves accented characters and Unicode text
+    - Maintains sentence structure and punctuation
+    - Filters content shorter than 20 characters per line
+    - Returns empty string for null/empty input
     """
     if not text:
         return ""

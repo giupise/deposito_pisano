@@ -6,14 +6,45 @@ from duckduckgo_search import DDGS
 from langchain.schema import Document
 from langchain_community.document_loaders import WebBaseLoader
 
-from utils import clean_web_content
+from .utils import clean_web_content
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
 
 def ddgs_results(query: str, max_results: int = 5):
     """
-    Ricerca web con DDGS diretto, bypassa SSL e gestisce errori.
+    Perform web search using DuckDuckGo Search with SSL bypass and error handling.
+    
+    Executes web search queries using DDGS (DuckDuckGo Search) API with optimized
+    configuration for reliable results. Includes SSL verification bypass for
+    improved connectivity and comprehensive error handling.
+    
+    Parameters
+    ----------
+    query : str
+        Search query string for web search
+    max_results : int, optional
+        Maximum number of search results to return (default: 5)
+        
+    Returns
+    -------
+    List[str]
+        List of URLs from search results, empty list if search fails
+        
+    Features
+    --------
+    - SSL verification bypass for improved connectivity
+    - Custom User-Agent header for better compatibility
+    - Regional search configuration (us-en)
+    - Moderate safe search filtering
+    - 20-second timeout for reliability
+    - Detailed logging of results and errors
+    
+    Notes
+    -----
+    Results are formatted as URLs only for compatibility with downstream
+    processing. Full result metadata (titles, descriptions) are logged
+    but not returned in the output.
     """
     print(f"🔍 DDGS: Ricerca per '{query}' (max {max_results} risultati)")
 
@@ -29,9 +60,9 @@ def ddgs_results(query: str, max_results: int = 5):
                 ddgs.text(
                     keywords=query,
                     max_results=max_results,
-                    region="it-it",
+                    region="us-en",
                     safesearch="moderate",
-                    timelimit="y",  # Risultati dell'ultimo anno
+                    timelimit=None,  # Risultati dell'ultimo anno
                 )
             )
 
@@ -52,7 +83,50 @@ def ddgs_results(query: str, max_results: int = 5):
 
 def web_search_and_format(path: str):
     """
-    Esegue una ricerca web, carica il contenuto e lo pulisce per un migliore processing.
+    Load and clean web content for RAG system integration.
+    
+    Fetches web page content from the specified URL, applies comprehensive
+    cleaning to remove navigation elements and noise, and formats the result
+    as LangChain Document objects suitable for vector indexing.
+    
+    Parameters
+    ----------
+    path : str
+        URL of the web page to load and process
+        
+    Returns
+    -------
+    List[Document]
+        List of cleaned Document objects with web content and metadata
+        
+    Processing Pipeline
+    ------------------
+    1. **Content Extraction**: Uses WebBaseLoader with CSS selectors for main content
+    2. **Cleaning**: Applies clean_web_content() for noise reduction
+    3. **Validation**: Filters out empty or overly short content
+    4. **Formatting**: Creates Document objects with URL metadata
+    
+    Targeted Content Selectors
+    --------------------------
+    - article, main: Primary content containers
+    - .content, .post-content: CMS-specific content areas  
+    - #content, #main-content: Common content identifiers
+    - .entry-content: Blog post content areas
+    - p: Fallback to paragraph extraction
+    
+    Error Handling
+    -------------
+    - Graceful fallback through multiple extraction strategies
+    - Comprehensive exception handling with detailed logging
+    - Returns empty list if all strategies fail
+    - Content length validation to ensure meaningful results
+    
+    Notes
+    -----
+    - Uses BeautifulSoup parser for reliable HTML processing
+    - Applies domain-specific cleaning rules for Italian and English content
+    - Minimum content length threshold of 100 characters
+    - All results include source URL in metadata for citation purposes
     """
     print(f"🌐 Caricamento contenuto da: {path}")
 

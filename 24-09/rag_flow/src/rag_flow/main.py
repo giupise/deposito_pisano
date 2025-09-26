@@ -1,258 +1,444 @@
+#!/usr/bin/env python
+from pydantic import BaseModel
+from crewai.flow import Flow, listen, start, router
+from rag_flow.crews.poem_crew.rag_crew import AeronauticRagCrew
+from rag_flow.crews.web_crew.web_crew import WebCrew
+from rag_flow.crews.doc_crew.doc_crew import DocCrew
 import os
-from pathlib import Path
-from dotenv import load_dotenv
-import ssl
-import urllib3
-import requests
-import re
-import json
+from langchain_openai import AzureChatOpenAI
 
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
-os.environ["CURL_CA_BUNDLE"] = ""
-os.environ["REQUESTS_CA_BUNDLE"] = ""
-os.environ["SSL_VERIFY"] = "false"
-os.environ["PYTHONHTTPSVERIFY"] = "0"
-os.environ["OTEL_SDK_DISABLED"] = "true"
-
-ssl._create_default_https_context = ssl._create_unverified_context
-
-# Patch requests per ignorare SSL
-original_request = requests.request
-def no_ssl_request(*args, **kwargs):
-    kwargs['verify'] = False
-    return original_request(*args, **kwargs)
-requests.request = no_ssl_request
-
-original_session_request = requests.Session.request
-def no_ssl_session_request(self, *args, **kwargs):
-    kwargs['verify'] = False
-    return original_session_request(self, *args, **kwargs)
-requests.Session.request = no_ssl_session_request
+#load_dotenv()  # Carica le variabili d'ambiente dal file .env 
+endpoint = os.getenv("AZURE_API_BASE")
+key = os.getenv("AZURE_API_KEY")
+deployment_name = os.getenv("MODEL")  # nome deployment modello completions
+api_version=os.getenv("AZURE_API_VERSION", "2024-06-01")
 
 
-def find_and_load_env():
-    current = Path(__file__).resolve()
-    possible_locations = [
-        current.parent,
-        current.parent.parent,
-        current.parent.parent.parent,
-    ]
-    for location in possible_locations:
-        env_file = location / ".env"
-        if env_file.exists():
-            print(f"✅ Trovato .env in: {env_file}")
-            load_dotenv(env_file, override=True)
-            return True
-    print("❌ .env non trovato!")
-    return False
-
-find_and_load_env()
-
-
-AZURE_KEY = os.getenv("AZURE_API_KEY")
-AZURE_BASE = os.getenv("AZURE_API_BASE", "").rstrip("/") + "/"
-AZURE_VERSION = os.getenv("AZURE_API_VERSION", "2024-02-01")
-DEPLOYMENT = os.getenv("AZURE_DEPLOYMENT_NAME", "gpt-4o")
-
-if AZURE_KEY and AZURE_BASE:
-    os.environ["LITELLM_PROVIDER"] = "azure"
-    os.environ["LITELLM_MODEL"] = f"azure/{DEPLOYMENT}"
-    os.environ["LITELLM_API_BASE"] = AZURE_BASE
-    os.environ["LITELLM_API_VERSION"] = AZURE_VERSION
-    os.environ["LITELLM_API_KEY"] = AZURE_KEY
-    os.environ["OPENAI_API_KEY"] = AZURE_KEY
-
-    print("✅ Azure configurato")
-    print(f"   Endpoint: {AZURE_BASE}")
-    print(f"   Version : {AZURE_VERSION}")
-    print(f"   Deploy  : {DEPLOYMENT}")
-    print(f"   LiteLLM Model: azure/{DEPLOYMENT}")
-
-
-from crewai.flow import Flow, start, router, listen
-from ethical_flow.crews.ethical_reviewer_crew.ethical_reviewer_crew import EthicalReviewerCrew
-from ethical_flow.crews.outline_crew.outline_crew import OutlineCrew
-from ethical_flow.crews.research_crew.research_crew import ResearchCrew
-
-
-def safe_json_extract(text: str):
+class AeronauticRagState(BaseModel):
     """
-    Prova ad estrarre il primo blocco JSON valido da una stringa.
+    State model for Aeronautic RAG Flow execution.
+    
+    This Pydantic model manages the state data throughout the RAG flow execution,
+    storing user inputs, intermediate results, and final aggregated outputs from
+    different processing stages.
+    
+    Attributes
+    ----------
+    question_input : str
+        User's input question about aeronautics (default: "")
+    rag_result : str
+        Result from RAG system analysis using local document knowledge base (default: "")
+    web_result : str
+        Result from web search and analysis using external sources (default: "")
+    all_results : str
+        Aggregated results combining RAG and web analysis outputs (default: "")
+        
+    Notes
+    -----
+    State persistence enables tracking of data flow between different crew executions
+    and allows for comprehensive result aggregation and document generation.
     """
-    try:
-        match = re.search(r'\{.*\}', text, re.DOTALL)
-        if match:
-            return json.loads(match.group(0))
-        return json.loads(text)
-    except Exception:
-        return {}
+    question_input: str = ""
+    rag_result: str = ""
+    web_result: str = ""
+    all_results: str = ""
 
-def clean_agent_output(text: str) -> str:
+class AeronauticRagFlow(Flow[AeronauticRagState]):
     """
-    Ripulisce l'output degli agenti rimuovendo blocchi markdown, JSON grezzi
-    e prefissi che non appartengono al contenuto finale del report.
+    Multi-stage RAG flow for comprehensive aeronautic question answering.
+    
+    This CrewAI Flow orchestrates a sophisticated question-answering pipeline that combines
+    local knowledge base retrieval, web search capabilities, and document generation.
+    The flow includes question validation, dual-source analysis, and result aggregation.
+    
+    Flow Architecture
+    -----------------
+    1. **Starting Procedure**: Initialize flow execution
+    2. **Question Generation**: Capture user input for aeronautic queries
+    3. **Question Analysis**: Validate aeronautic relevance using Azure OpenAI
+    4. **RAG Analysis**: Local document-based knowledge retrieval and answer generation
+    5. **Web Analysis**: External web search for complementary information
+    6. **Result Aggregation**: Combine and synthesize all findings into comprehensive documentation
+    7. **Plot Generation**: Visualize the flow execution graph
+    
+    Crew Integration
+    ----------------
+    - **AeronauticRagCrew**: Local knowledge base querying with FAISS vector store
+    - **WebCrew**: Web search and content analysis using SerperDev API
+    - **DocCrew**: Professional markdown document generation and synthesis
+    
+    State Management
+    ----------------
+    Uses AeronauticRagState for persistent data flow between stages, enabling
+    comprehensive result tracking and aggregation across multiple crew executions.
+    
+    Routing Logic
+    -------------
+    Implements intelligent routing based on question relevance:
+    - 'success': Question is aeronautic-relevant, proceed with full analysis
+    - 'retry': Question lacks aeronautic context, restart question capture
+    
+    Notes
+    -----
+    - Requires Azure OpenAI credentials for question validation
+    - Integrates with local FAISS knowledge base and external web sources
+    - Produces comprehensive markdown documentation with source citations
+    - Includes flow visualization capabilities for pipeline monitoring
     """
-    # Rimuovi blocchi di codice tipo ```json ... ```
-    text = re.sub(r"```[\s\S]*?```", "", text)
 
-    # Rimuovi blocchi JSON isolati { ... } che contengono solo meta-informazioni
-    text = re.sub(r'^\s*\{.*?\}\s*$', '', text, flags=re.DOTALL | re.MULTILINE)
+    @start('retry')
+    def starting_procedure(self):
+        """
+        Initialize the Aeronautic RAG Flow execution.
+        
+        Entry point for the flow that sets up the initial state and begins
+        the question-answering pipeline. Configured to retry on validation failure.
+        
+        Notes
+        -----
+        The 'retry' parameter enables automatic restart when question validation
+        determines that the input is not relevant to aeronautics.
+        """
+        print("Starting the Aeronautic RAG Flow")
 
-    # Rimuovi linee che iniziano con "approved", "bias_score", "concerns"
-    text = re.sub(r'^\s*"?approved"?:.*$', '', text, flags=re.MULTILINE | re.IGNORECASE)
-    text = re.sub(r'^\s*"?bias_score"?:.*$', '', text, flags=re.MULTILINE | re.IGNORECASE)
-    text = re.sub(r'^\s*"?concerns"?:.*$', '', text, flags=re.MULTILINE | re.IGNORECASE)
+    @listen(starting_procedure)
+    def generate_question(self):
+        """
+        Capture user input for aeronautic question processing.
+        
+        Interactive step that prompts the user to enter their aeronautic-related
+        question and stores it in the flow state for subsequent processing stages.
+        
+        State Updates
+        -------------
+        Updates self.state.question_input with the user's entered question.
+        
+        Notes
+        -----
+        This method uses interactive input() which requires console interaction.
+        The captured question will be validated for aeronautic relevance in
+        the next flow stage.
+        """
+        print("Generating question")
+        question = input("Enter your question about aeronautics: ")
+        self.state.question_input = question
 
-    # Rimuovi prefissi comuni
-    text = re.sub(r"(Final Answer:|Answer:)", "", text, flags=re.IGNORECASE)
+    @router(generate_question)
+    def question_analysis(self):
+        """
+        Validate question relevance to aeronautics using Azure OpenAI.
+        
+        Analyzes the user's question to determine if it's relevant to aeronautics
+        using Azure OpenAI GPT-4o model. Routes the flow based on validation results
+        to ensure only aeronautic questions proceed to full analysis.
+        
+        Returns
+        -------
+        str
+            Routing decision:
+            - "success": Question is aeronautic-relevant, proceed with analysis
+            - "retry": Question is not aeronautic-relevant, restart question capture
+            
+        LLM Configuration
+        ----------------
+        - Model: Azure OpenAI GPT-4o
+        - Temperature: 0 (deterministic responses)
+        - Max Retries: 2 (robust error handling)
+        - API Version: From environment variable AZURE_API_VERSION
+        
+        Validation Logic
+        ---------------
+        Uses a system prompt defining the AI as an aeronautics expert and asks
+        for binary True/False validation of question relevance. Response parsing
+        is case-insensitive and searches for 'true' substring.
+        
+        Environment Dependencies
+        -----------------------
+        Requires AZURE_API_BASE, AZURE_API_KEY, MODEL, and AZURE_API_VERSION
+        environment variables for Azure OpenAI service connection.
+        
+        Notes
+        -----
+        This routing mechanism ensures the RAG system only processes relevant
+        queries, improving efficiency and result quality by filtering out
+        off-topic questions early in the pipeline.
+        """
+        llm = AzureChatOpenAI(
+            azure_deployment="gpt-4o",  # or your deployment
+        api_version=api_version,  # or your api version
+        temperature=0,
+        max_retries=2,
+        # other params...
+        ) 
+        print("Analyzing question")
+        messages=[
+                {"role": "system", "content": "You are an expert in aeronautics."},
+                {"role": "user", "content": f"Is the following question relevant to aeronautics? Question: {self.state.question_input}. Answer only with 'True' or 'False'"}
+            ]
+        
+        res = llm.invoke(messages)
+        res = res.content.strip().lower()
 
-    # Collassa linee vuote multiple
-    text = re.sub(r"\n\s*\n", "\n\n", text)
-
-    return text.strip()
-
-
-
-class EthicalFlow(Flow):
-    def __init__(self):
-        super().__init__()
-        self.outline_points = []
-        self.research_content = {}
-
-    @start("retry")
-    def start(self):
-        print("🚀 Avvio del flusso di valutazione etica...")
-        return "starting"
-
-    @listen(start)
-    def ethical_review(self):
-        print("⚖️ Fase 1: Ethical Review - Controllo etico della domanda")
-        ethical_reviewer_crew = EthicalReviewerCrew().crew()
-        result = ethical_reviewer_crew.kickoff(inputs={"user_input": self.state["user_input"]})
-        return str(result)
-
-    @router("ethical_review")
-    def decide_ethical_route(self, result: str):
-        parsed = safe_json_extract(result)
-
-        if parsed.get("is_ethical", True):  # default = True
-            print("✅ Domanda etica - proseguo verso outline_creation")
-            return "ethical_approved"
+        if 'true' in res:
+            return "success"
         else:
-            self.state["motivation"] = parsed.get("reasoning", "N/A")
-            print(f"❌ Domanda non etica: {self.state['motivation']}")
             return "retry"
 
-    @listen("ethical_approved")
-    def outline_creation(self):
-        print("📝 Fase 2: Outline Creation - Creazione scaletta punti")
-        outline_crew = OutlineCrew().crew()
-        result = outline_crew.kickoff(inputs={"user_input": self.state['user_input']})
-
-        try:
-            json_match = re.search(r'\{[^{}]*"outline"[^{}]*\}', str(result), re.DOTALL)
-            if json_match:
-                parsed = json.loads(json_match.group(0))
-                outline_sections = parsed.get("outline", [])
-                self.outline_points = [s.get("section", "") for s in outline_sections]
-                print(f"📋 Scaletta creata: {len(self.outline_points)} punti")
-                return str(result)
-        except Exception as e:
-            print(f"⚠️ Errore parsing outline: {e}")
-
-        lines = str(result).split("\n")
-        self.outline_points = [line.strip() for line in lines if line.strip() and not line.startswith("📝")][:5]
-        return str(result)
-
-    @listen("outline_creation")
-    def bias_review(self):
-        print("🔍 Fase 3: Bias Review - Controllo bias e accuratezza")
-        bias_prompt = f"""
-        Analizza questa scaletta per bias, accuratezza e rischi:
-        Punti: {self.outline_points}
-        Topic originale: {self.state['user_input']}
-        Restituisci un JSON con:
-        {{"approved": true/false, "concerns": ["concern1"], "recommendations": ["rec1"]}}
+    @listen("success")
+    def rag_analysis(self):
         """
-        bias_reviewer = EthicalReviewerCrew().crew()
-        result = bias_reviewer.kickoff(inputs={"user_input": bias_prompt})
-        return str(result)
+        Execute RAG-based analysis using local aeronautic knowledge base.
+        
+        Processes the validated aeronautic question through the AeronauticRagCrew,
+        which uses FAISS vector store and Azure OpenAI embeddings to retrieve
+        relevant context from local documents and generate comprehensive answers.
+        
+        Crew Execution
+        -------------
+        - Crew: AeronauticRagCrew (rag_expert agent with rag_system tool)
+        - Input: User's validated aeronautic question
+        - Processing: Vector similarity search + context-aware answer generation
+        - Output: RAG-generated response with source citations
+        
+        State Updates
+        -------------
+        Updates self.state.rag_result with the raw output from the RAG crew execution.
+        
+        Knowledge Base
+        --------------
+        Utilizes local FAISS vector store containing aeronautic documentation,
+        technical manuals, and domain-specific knowledge for accurate,
+        context-grounded responses.
+        
+        Answer Quality
+        --------------
+        - Source citations for transparency and verification
+        - Anti-hallucination safeguards through context-only responses
+        - Technical accuracy through domain-specific knowledge base
+        - RAGAS evaluation metrics for quality assessment
+        
+        Notes
+        -----
+        This is the primary knowledge retrieval stage that leverages local
+        expertise. Results are complemented by web analysis in the next stage
+        for comprehensive coverage.
+        """
+        print("Starting RAG analysis")
+        result = (
+            AeronauticRagCrew()
+            .crew()
+            .kickoff(inputs={"question": self.state.question_input,
+                             })
+        )
+        print(result.raw)
+        self.state.rag_result = result.raw
+    
+    @listen(rag_analysis)
+    def web_analysis(self):
+        """
+        Execute web-based analysis to complement local knowledge base.
+        
+        Processes the aeronautic question through WebCrew to gather external
+        information from web sources, providing broader context and current
+        information that may not be available in local documentation.
+        
+        Crew Execution
+        -------------
+        - Crew: WebCrew (web_analyst agent with SerperDevTool)
+        - Input: User's validated aeronautic question
+        - Processing: Web search + content extraction + analysis
+        - Output: Structured summary of web search findings
+        
+        State Updates
+        -------------
+        Updates self.state.web_result with the raw output from the web crew execution.
+        
+        Search Strategy
+        ---------------
+        - Uses SerperDevTool for reliable web search results
+        - Analyzes and summarizes relevant web content
+        - Filters results for aeronautic relevance and quality
+        - Provides structured insights from multiple web sources
+        
+        Content Enhancement
+        -------------------
+        - Complements local knowledge with current information
+        - Provides multiple perspectives on aeronautic topics
+        - Includes recent developments and industry updates
+        - Validates and cross-references local knowledge base findings
+        
+        Notes
+        -----
+        Web analysis results are combined with RAG analysis in the aggregation
+        stage to provide comprehensive, multi-source answers with both local
+        expertise and current external information.
+        """
+        print("Web analysis")
+        result = (
+            WebCrew()
+            .crew()
+            .kickoff(inputs={"question": self.state.question_input,
+                             })
+        )
+        self.state.web_result = result.raw
+        print(result.raw)
+        # Here you can add more processing of the rag_result if needed
+    
+    @listen(web_analysis)
+    def aggregate_results(self):
+        """
+        Aggregate and synthesize results from RAG and web analysis.
+        
+        Combines outputs from both local knowledge base (RAG) and external web sources
+        into a comprehensive aggregated result, then processes this through DocCrew
+        for professional document generation and final synthesis.
+        
+        Aggregation Process
+        -------------------
+        1. Combines RAG result and web result into structured format
+        2. Updates flow state with aggregated content
+        3. Passes aggregated results to DocCrew for document generation
+        4. Produces final comprehensive markdown documentation
+        
+        State Updates
+        -------------
+        Updates self.state.all_results with combined RAG and web analysis outputs
+        formatted for document generation processing.
+        
+        Crew Execution
+        --------------
+        - Crew: DocCrew (doc_redactor agent)
+        - Input: Aggregated results from RAG and web analysis
+        - Processing: Document structuring + markdown generation
+        - Output: Professional comprehensive documentation with proper formatting
+        
+        Document Features
+        -----------------
+        - Structured markdown format for readability
+        - Integration of multiple information sources
+        - Professional presentation and organization
+        - Source attribution and cross-referencing
+        - Technical accuracy and completeness
+        
+        Output Format
+        -------------
+        Generated document includes:
+        - Executive summary of findings
+        - Detailed analysis from local knowledge base
+        - Complementary insights from web sources
+        - Source citations and references
+        - Professional formatting and structure
+        
+        Notes
+        -----
+        This stage represents the culmination of the multi-source analysis,
+        producing a comprehensive, well-structured document that combines
+        the best of local expertise and current external information.
+        """
+        print("Aggregating results")
+        aggregated = f"RAG Result: {self.state.rag_result}\n\nWeb Result: {self.state.web_result}"
+        self.state.all_results = aggregated
+        result = (
+            DocCrew()
+            .crew()
+            .kickoff(inputs={"paper": aggregated,
+                             })
+        )
+        print(result.raw)
+    
+    @listen(aggregate_results)
+    def plot_generation(self):
+        """
+        Generate and display flow execution visualization.
+        
+        Creates a visual representation of the flow execution graph showing
+        the complete pipeline from question input through final document generation.
+        Useful for monitoring, debugging, and understanding the flow architecture.
+        
+        Visualization Features
+        ----------------------
+        - Complete flow graph with all stages and connections
+        - Node representations for each processing step
+        - Edge connections showing data flow and dependencies
+        - Routing decisions and conditional paths
+        - State transitions and crew executions
+        
+        Use Cases
+        ---------
+        - Pipeline monitoring and debugging
+        - Flow architecture documentation
+        - Performance analysis and optimization
+        - Educational and presentation purposes
+        - System maintenance and troubleshooting
+        
+        Notes
+        -----
+        This final stage provides visual feedback on the complete flow execution,
+        enabling users to understand the processing pipeline and verify correct
+        routing and stage execution.
+        """
+        print("Plotting the flow")
+        self.plot()
 
-    @router("bias_review")
-    def decide_bias_route(self, result: str):
-        parsed = safe_json_extract(result)
 
-        if parsed.get("approved", True):  # default = True
-            print("✅ Bias Review superato - proseguo verso research")
-        else:
-            print("⚠️ Bias rilevati - proseguo comunque verso research")
-
-        return "bias_approved"
-
-    @listen("bias_approved")
-    def research_phase(self):
-        print("🔬 Fase 4: Research Phase - Ricerca dettagliata")
-        research_crew = ResearchCrew().crew()
-        for i, point in enumerate(self.outline_points[:3]):
-            print(f"🔍 Ricerca per punto {i+1}: {point}")
-            research_result = research_crew.kickoff(inputs={
-                "research_point": point,
-                "main_topic": self.state['user_input']
-            })
-            self.research_content[point] = clean_agent_output(str(research_result))
-        return f"Ricerca completata per {len(self.research_content)} punti"
-
-    @listen("research_phase")
-    def export_report(self):
-        print("📄 Fase 5: Export - Creazione report finale")
-        output_dir = Path("output")
-        output_dir.mkdir(exist_ok=True)
-        report_path = output_dir / "report.md"
-
-        report_content = f"# Report di Analisi\n\n## Topic: {self.state['user_input']}\n\n## Scaletta Approvata\n"
-        for i, point in enumerate(self.outline_points, 1):
-            report_content += f"\n{i}. {point}"
-        report_content += "\n\n## Ricerca Dettagliata\n"
-
-        for point, research in self.research_content.items():
-            cleaned = clean_agent_output(str(research))
-            if cleaned:
-                report_content += f"\n## {point}\n\n{cleaned}\n\n---\n"
-
-        report_content += "\n\n*Report generato automaticamente dal sistema EthicalFlow*"
-
-        with open(report_path, "w", encoding="utf-8") as f:
-            f.write(report_content)
-
-        print(f"✅ Report salvato in: {report_path}")
-        return f"📄 Report completato e salvato in {report_path}"
-
-    @listen("invalid_output")
-    def invalid_output_step(self):
-        return "⚠️ Errore: output non valido dal sistema di revisione."
-
-    @listen("retry")
-    def retry_step(self):
-        domanda = input("👉 Inserisci una nuova domanda (deve essere etica): ")
-        self.state["user_input"] = domanda
-        return "starting"
 
 
 def kickoff():
-    print("🎯 Avvio EthicalFlow con nuovo sistema completo")
-    print("=" * 50)
-    flow = EthicalFlow()
-    domanda = input("👉 Inserisci la tua domanda per l'analisi completa: ")
-    flow.state["user_input"] = domanda
-    result = flow.kickoff()
-    print("\n" + "=" * 50)
-    print("🏁 Flusso completato!")
-    print(result)
+    """
+    Initialize and execute the Aeronautic RAG Flow.
+    
+    Entry point function that creates an instance of AeronauticRagFlow
+    and starts the complete question-answering pipeline execution.
+    
+    Flow Execution
+    --------------
+    Triggers the complete multi-stage pipeline:
+    1. Question capture and validation
+    2. RAG-based local knowledge analysis
+    3. Web-based external information gathering
+    4. Result aggregation and document generation
+    5. Flow visualization and monitoring
+    
+    Notes
+    -----
+    This function is the main entry point for interactive execution
+    of the aeronautic question-answering system.
+    """
+    aeronautic_rag_flow = AeronauticRagFlow()
+    aeronautic_rag_flow.kickoff()
+
 
 def plot():
-    flow = EthicalFlow()
-    flow.plot()
+    """
+    Generate and display the flow architecture visualization.
+    
+    Creates a visual representation of the AeronauticRagFlow pipeline
+    without executing the flow, useful for documentation and architecture
+    review purposes.
+    
+    Visualization Output
+    --------------------
+    - Complete flow graph showing all stages and connections
+    - Node representations for each processing step
+    - Routing logic and conditional paths
+    - State management and data flow
+    
+    Use Cases
+    ---------
+    - Architecture documentation and review
+    - System design presentations
+    - Flow optimization and debugging
+    - Educational and training purposes
+    
+    Notes
+    -----
+    This function provides flow visualization without execution,
+    enabling architecture review and documentation without processing
+    actual questions through the pipeline.
+    """
+    aeronautic_rag_flow = AeronauticRagFlow()
+    aeronautic_rag_flow.plot()
+
 
 if __name__ == "__main__":
     kickoff()

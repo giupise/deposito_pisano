@@ -10,8 +10,8 @@ from ragas.metrics import \
 from ragas.metrics import context_recall  # copertura dei chunk rilevanti
 from ragas.metrics import faithfulness  # ancoraggio della risposta al contesto
 
-from rag_structure import get_contexts_for_question
-from utils import Settings
+from .rag_structure import get_contexts_for_question
+from .utils import Settings
 
 
 def build_ragas_dataset(
@@ -22,8 +22,51 @@ def build_ragas_dataset(
     ground_truth: dict[str, str] | None = None,
 ):
     """
-    Esegue la pipeline RAG per ogni domanda e costruisce il dataset per Ragas.
-    Ogni riga contiene: question, contexts, answer, (opzionale) ground_truth.
+    Build RAGAS evaluation dataset from RAG pipeline execution.
+    
+    Executes the complete RAG pipeline for each question to generate the
+    evaluation dataset required by RAGAS framework. Each dataset entry contains
+    question, retrieved contexts, generated answer, and optional ground truth.
+    
+    Parameters
+    ----------
+    questions : List[str]
+        List of questions to evaluate through the RAG pipeline
+    retriever : VectorStoreRetriever
+        Configured retriever for context extraction
+    chain : RunnableSequence
+        RAG chain for answer generation
+    k : int
+        Number of context chunks to retrieve per question
+    ground_truth : dict[str, str], optional
+        Dictionary mapping questions to their ground truth answers
+        
+    Returns
+    -------
+    List[dict]
+        List of evaluation entries, each containing:
+        - question: Input question
+        - contexts: Retrieved context chunks
+        - answer: Generated RAG answer
+        - ground_truth: Reference answer (if provided)
+        
+    Dataset Structure
+    -----------------
+    Each entry follows RAGAS expected format::
+    
+        {
+            'question': str,
+            'contexts': List[str], 
+            'answer': str,
+            'ground_truth': str (optional)
+        }
+    
+    Notes
+    -----
+    - Ground truth is optional but enables answer_correctness evaluation
+    - Context extraction uses the configured retrieval strategy
+    - Answer generation follows the complete RAG chain
+    - Dataset format is compatible with RAGAS EvaluationDataset
     """
     dataset = []
     for q in questions:

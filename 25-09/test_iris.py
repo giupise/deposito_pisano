@@ -12,3 +12,4 @@ def test_classify_iris_accuracy_reasonable():
     # DecisionTree on Iris should usually be above 0.8 with this split
     assert acc >= 0.8
 
+

@@ -4,12 +4,12 @@ import shutil
 from pathlib import Path
 
 # Import moduli del RAG system
-from azure_connections import get_azure_embedding_model, get_llm_from_lmstudio
-from ddgs_scripts import ddgs_results, web_search_and_format
-from faiss_code import load_or_build_vectorstore, make_retriever
-from rag_structure import build_rag_chain, keywords_generation, rag_answer
-from ragas_scripts import ragas_evaluation
-from utils import Settings, load_documents, scan_docs_folder
+from .azure_connections import get_azure_embedding_model, get_llm_from_lmstudio
+from .ddgs_scripts import ddgs_results, web_search_and_format
+from .faiss_code import load_or_build_vectorstore, make_retriever
+from .rag_structure import build_rag_chain, keywords_generation, rag_answer
+from .ragas_scripts import ragas_evaluation
+from .utils import Settings, load_documents, scan_docs_folder
 
 warnings.filterwarnings("ignore", category=UserWarning)
 

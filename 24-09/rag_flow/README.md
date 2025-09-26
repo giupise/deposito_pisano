@@ -23,10 +23,10 @@ crewai install
 
 **Add your `OPENAI_API_KEY` into the `.env` file**
 
-- Modify `src/ethical_flow/config/agents.yaml` to define your agents
-- Modify `src/ethical_flow/config/tasks.yaml` to define your tasks
-- Modify `src/ethical_flow/crew.py` to add your own logic, tools and specific args
-- Modify `src/ethical_flow/main.py` to add custom inputs for your agents and tasks
+- Modify `src/rag_flow/config/agents.yaml` to define your agents
+- Modify `src/rag_flow/config/tasks.yaml` to define your tasks
+- Modify `src/rag_flow/crew.py` to add your own logic, tools and specific args
+- Modify `src/rag_flow/main.py` to add custom inputs for your agents and tasks
 
 ## Running the Project
 
@@ -36,13 +36,13 @@ To kickstart your flow and begin execution, run this from the root folder of you
 crewai run
 ```
 
-This command initializes the ethical-flow Flow as defined in your configuration.
+This command initializes the rag_flow Flow as defined in your configuration.
 
 This example, unmodified, will run the create a `report.md` file with the output of a research on LLMs in the root folder.
 
 ## Understanding Your Crew
 
-The ethical-flow Crew is composed of multiple AI agents, each with unique roles, goals, and tools. These agents collaborate on a series of tasks, defined in `config/tasks.yaml`, leveraging their collective skills to achieve complex objectives. The `config/agents.yaml` file outlines the capabilities and configurations of each agent in your crew.
+The rag_flow Crew is composed of multiple AI agents, each with unique roles, goals, and tools. These agents collaborate on a series of tasks, defined in `config/tasks.yaml`, leveraging their collective skills to achieve complex objectives. The `config/agents.yaml` file outlines the capabilities and configurations of each agent in your crew.
 
 ## Support
 
