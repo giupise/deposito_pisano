@@ -46,7 +46,7 @@ def ddgs_results(query: str, max_results: int = 5):
     processing. Full result metadata (titles, descriptions) are logged
     but not returned in the output.
     """
-    print(f"🔍 DDGS: Ricerca per '{query}' (max {max_results} risultati)")
+    print(f" DDGS: Ricerca per '{query}' (max {max_results} risultati)")
 
     try:
         # DDGS con SSL bypass
@@ -66,7 +66,7 @@ def ddgs_results(query: str, max_results: int = 5):
                 )
             )
 
-        print(f"   ✅ {len(results)} risultati trovati")
+        print(f"    {len(results)} risultati trovati")
 
         # Formatta per compatibilità con il resto del codice
         formatted = []
@@ -166,7 +166,7 @@ def web_search_and_format(path: str):
 
                 docs = loader.load()
                 print(
-                    f"   🔍 Tentativo con selettori {selector_group['name']}: {len(docs)} documenti"
+                    f"    Tentativo con selettori {selector_group['name']}: {len(docs)} documenti"
                 )
 
                 for doc in docs:
@@ -181,7 +181,7 @@ def web_search_and_format(path: str):
                         doc.page_content = cleaned_content
                         valid_docs.append(doc)
                         print(
-                            f"   ✅ Contenuto valido trovato: {len(cleaned_content)} caratteri puliti"
+                            f"    Contenuto valido trovato: {len(cleaned_content)} caratteri puliti"
                         )
                         break
 
@@ -191,7 +191,7 @@ def web_search_and_format(path: str):
 
         # Strategia 2: Se non abbiamo trovato nulla, prova senza filtri ma pulisci di più
         if not valid_docs:
-            print("   🔄 Nessun contenuto valido trovato, provo senza filtri CSS...")
+            print("    Nessun contenuto valido trovato, provo senza filtri CSS...")
             try:
                 loader = WebBaseLoader(web_paths=(path,))
                 docs = loader.load()
@@ -223,7 +223,7 @@ def web_search_and_format(path: str):
                         doc.page_content = final_content
                         valid_docs.append(doc)
                         print(
-                            f"   ✅ Contenuto recuperato e pulito: {len(final_content)} caratteri"
+                            f"    Contenuto recuperato e pulito: {len(final_content)} caratteri"
                         )
                         break
 

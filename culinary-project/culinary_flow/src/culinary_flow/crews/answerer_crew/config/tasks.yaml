@@ -1,0 +1,13 @@
+final_answer:
+  description: |
+    Fornisci una risposta completa alla domanda dell'utente utilizzando le informazioni di ricerca.
+    
+    Domanda originale: {question}
+    
+    Utilizza le informazioni raccolte dal web_researcher (disponibili nel contesto del task precedente) per:
+    1. Analizzare le informazioni di ricerca fornite
+    2. Formula una risposta chiara e completa
+    3. Cita le fonti appropriate
+    4. Assicurati che la risposta sia comprensibile e utile
+  expected_output: "Risposta finale completa e ben strutturata con citazioni"
+  agent: answerer

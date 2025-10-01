@@ -608,7 +608,7 @@ def main():
         test_docs = debug_retriever(retriever, test_query)
 
         # 7) Loop interattivo
-        print("\n✅ Indicizzazione pronta.")
+        print("\n Indicizzazione pronta.")
         print("Fai una domanda e premi invio.")
         print("Comandi:")
         print("  :reindex - ricostruisce l'indice")

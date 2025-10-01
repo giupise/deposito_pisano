@@ -1,0 +1,8 @@
+web_analysis_task:
+  description: >
+    Analizza i risultati della ricerca web ed estrai informazioni rilevanti riguardo {question}.
+    Riassumi i punti chiave e le intuizioni dai risultati della ricerca web.
+  expected_output: >
+    Un riassunto conciso dei punti chiave e delle intuizioni estratte dai risultati della ricerca web riguardo {question}.
+    Il riassunto dovrebbe essere chiaro e rilevante per {question}.
+  agent: web_analyst

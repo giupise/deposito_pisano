@@ -86,7 +86,7 @@ def main():
         test_docs = debug_retriever(retriever, test_query)
 
         # 7) Loop interattivo
-        print("\n✅ Indicizzazione pronta.")
+        print("\n Indicizzazione pronta.")
         print("\nFai una domanda e premi invio.")
         print("\nComandi disponibili:")
         print("  :reindex         - ricostruisce l'indice")
@@ -112,17 +112,17 @@ def main():
                 
             if q.lower() == ":clear":
                 eval_runs.clear()
-                print("✅ Cronologia valutazioni cancellata.")
+                print(" Cronologia valutazioni cancellata.")
                 continue
                 
             if q.lower() == ":reindex":
-                print("🔄 Ricostruzione indice...")
+                print(" Ricostruzione indice...")
                 shutil.rmtree(Path(settings.persist_dir), ignore_errors=True)
                 docs = load_documents_from_dir(settings.data_dir)
                 vector_store = load_or_build_vectorstore(settings, embeddings, docs)
                 retriever = make_retriever(vector_store, settings)
                 chain = build_rag_chain(llm, retriever)
-                print("✅ Indice ricostruito.")
+                print(" Indice ricostruito.")
                 continue
                 
             if q.lower().startswith(":debug "):
@@ -160,7 +160,7 @@ def main():
                             print(f"{metric:25s}: {value:.3f}")
                         print("=" * 45)
                         print(f"\nReport dettagliato salvato in:")
-                        print(f"  📊 CSV: {res['csv_path']}")
+                        print(f"   CSV: {res['csv_path']}")
                         print(f"  📄 JSON: {res['json_path']}")
                     else:
                         print("[EVAL] Valutazione fallita.")

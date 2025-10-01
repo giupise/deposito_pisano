@@ -85,7 +85,7 @@ def rag_system(question : str) -> str:
     if name_index:
         name_index = settings.set_persist_dir_from_query(name_index)
 
-    print(f"📂 Usando indice FAISS in: {name_index}")
+    print(f"Usando indice FAISS in: {name_index}")
 
     # 1) Componenti
     embeddings = get_azure_embedding_model()
@@ -105,7 +105,7 @@ def rag_system(question : str) -> str:
     #     vector_store = load_or_build_vectorstore(settings, embeddings, docs)
     # else:
     #     query = input("Inserisci il termine di ricerca web: ").strip()
-    #     print(f"🔍 Eseguo ricerca web su: {query}")
+    #     print(f" Eseguo ricerca web su: {query}")
     #     keywords = keywords_generation(query)
     #     print(f"🔑 Keywords generate: {keywords}")
     #     str_new = " ".join(keywords)
@@ -133,7 +133,7 @@ def rag_system(question : str) -> str:
     #         validation_response = llm.invoke([{"role": "user", "content": validation_prompt}])
     #         validation_score = validation_response.content.strip()
             
-    #         print(f"🔍 Validazione contenuto da {url}: {validation_score[:100]}...")
+    #         print(f" Validazione contenuto da {url}: {validation_score[:100]}...")
             
     #         # Filtra documenti solo se la validazione è positiva
     #         if any(str(i) in validation_score for i in range(6, 11)):

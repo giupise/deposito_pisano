@@ -1,0 +1,25 @@
+# ===================================================
+# REQUIREMENTS MINIMAL - Solo librerie essenziali
+# ===================================================
+
+# Configuration
+python-dotenv
+
+# Azure OpenAI
+openai
+langchain-openai
+
+# LangChain Core
+langchain
+langchain-community
+
+# Vector Database
+qdrant-client
+
+# Document Processing
+pypdf
+docx2txt
+
+# Basic utilities
+numpy
+requests

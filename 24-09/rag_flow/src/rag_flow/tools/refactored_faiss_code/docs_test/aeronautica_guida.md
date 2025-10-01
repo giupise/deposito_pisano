@@ -34,7 +34,7 @@ L'aeronautica rappresenta uno dei settori più avanzati e strategici dell'econom
 
 ---
 
-## 📊 Caratteristiche del Settore Aeronautico
+##  Caratteristiche del Settore Aeronautico
 
 ### Struttura del Mercato
 - **Alta barriera all'ingresso**: Investimenti enormi in flotta e infrastrutture

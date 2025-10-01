@@ -1,0 +1,8 @@
+bias_check_task:
+  description: >
+    Analizza tutto il contenuto nel documento per potenziali bias: {document}
+    Considera varie prospettive
+  expected_output: >
+    Un documento valido in formato markdown senza alcun bias.
+    Non aggiungere alcun testo, modifica solo il documento per rimuovere i bias se necessario.
+  agent: bias_checker

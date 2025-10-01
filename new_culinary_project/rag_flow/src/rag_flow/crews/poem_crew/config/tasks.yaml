@@ -1,0 +1,7 @@
+rag_response_task:
+  description: >
+    Usa il sistema RAG per rispondere alla {question} basandoti sul contesto fornito.
+    DEVI usare il sistema RAG per recuperare informazioni rilevanti e generare risposte accurate.
+  expected_output: >
+    Il risultato esatto dal sistema RAG che fornisce una risposta accurata alla {question} basata sul contesto.
+  agent: rag_expert

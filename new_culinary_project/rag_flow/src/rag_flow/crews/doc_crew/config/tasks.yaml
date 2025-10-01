@@ -1,0 +1,6 @@
+doc_redaction_task:
+  description: >
+    Genera un documento in formato .md riguardo {paper} utilizzando le risposte fornite da rag_expert e web_analyst.
+  expected_output: >
+    Un documento markdown ben strutturato riguardo {paper} basato sulle risposte di rag_expert e web_analyst.
+  agent: doc_redactor

@@ -55,7 +55,7 @@ def find_and_load_env():
     for location in possible_locations:
         env_file = location / '.env'
         if env_file.exists():
-            print(f"✅ Trovato .env in: {env_file}")
+            print(f" Trovato .env in: {env_file}")
             load_dotenv(env_file)
             return True
     
@@ -67,9 +67,9 @@ find_and_load_env()
 
 # Verifica
 if os.getenv('OPENAI_API_KEY'):
-    print("✅ OPENAI_API_KEY caricata")
+    print(" OPENAI_API_KEY caricata")
 elif os.getenv('AZURE_API_KEY'):
-    print("✅ AZURE_API_KEY caricata")
+    print(" AZURE_API_KEY caricata")
 else:
     print("⚠️ Nessuna API key trovata nel .env")
 
@@ -110,7 +110,7 @@ class EthicalFlow(Flow):
             return "invalid_output"
 
         if parsed.get("is_ethical", False):
-            print("✅ Domanda etica - proseguo verso answer_step")
+            print(" Domanda etica - proseguo verso answer_step")
             return "ethical"
         else:
             self.state["motivation"] = parsed.get("reasoning", "N/A")
@@ -131,7 +131,7 @@ class EthicalFlow(Flow):
     @listen("retry")
     def retry_step(self):
         """Qui non rifacciamo review: solo chiediamo nuovo input"""
-        domanda = input("👉 Inserisci una nuova domanda: ")
+        domanda = input(" Inserisci una nuova domanda: ")
         self.state["user_input"] = domanda
         return "starting"   # fa ripartire da start → ethical_review
 
@@ -140,7 +140,7 @@ class EthicalFlow(Flow):
   # --- Utility functions ---
 def kickoff():
     flow = EthicalFlow()
-    domanda = input("👉 Inserisci la tua domanda: ")
+    domanda = input(" Inserisci la tua domanda: ")
     flow.state["user_input"] = domanda
     result = flow.kickoff()
     print(result)

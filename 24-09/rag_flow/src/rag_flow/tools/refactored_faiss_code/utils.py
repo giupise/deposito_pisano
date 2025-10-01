@@ -58,13 +58,13 @@ class Settings:
     # Persistenza FAISS
     persist_dir: str = "./faiss_db/default_aeronautics"
     # Text splitting - Parametri ottimizzati per documenti tecnici
-    chunk_size: int = 1000        # ✅ Chunks più grandi per più contesto
-    chunk_overlap: int = 200      # ✅ Overlap maggiore per continuità
+    chunk_size: int = 1000        #  Chunks più grandi per più contesto
+    chunk_overlap: int = 200      #  Overlap maggiore per continuità
     # Retriever (MMR)
     search_type: str = "mmr"  # "mmr" o "similarity"
-    k: int = 6               # ✅ Più risultati per migliore coverage
+    k: int = 6               #  Più risultati per migliore coverage
     fetch_k: int = 20        # candidati iniziali (per MMR)
-    mmr_lambda: float = 0.7  # ✅ Più pertinenza, meno diversificazione
+    mmr_lambda: float = 0.7  #  Più pertinenza, meno diversificazione
     # Embedding
     hf_model_name: str = "sentence-transformers/all-MiniLM-L6-v2"
     # LM Studio (OpenAI-compatible)
@@ -171,7 +171,7 @@ def load_documents(file_paths: List[str]) -> List[Document]:
     - Each document's content is previewed in logs (first 100 characters)
     - Total document count and individual file statistics are logged
     """
-    print(f"🔍 LOAD_DOCUMENTS: Caricamento di {len(file_paths)} file(s)")
+    print(f" LOAD_DOCUMENTS: Caricamento di {len(file_paths)} file(s)")
     documents = []
     for file_path in file_paths:
         print(f"📄 Caricamento file: {file_path}")
@@ -190,7 +190,7 @@ def load_documents(file_paths: List[str]) -> List[Document]:
             print(f"❌ Tipo file non supportato: {file_path}")
             continue
         docs = loader.load()
-        print(f"   ✅ Caricati {len(docs)} documento/i da {file_path}")
+        print(f"    Caricati {len(docs)} documento/i da {file_path}")
         for i, doc in enumerate(docs):
             content_preview = doc.page_content[:100].replace("\n", " ")
             print(
@@ -342,7 +342,7 @@ def scan_docs_folder(docs_dir: str = "docs") -> List[str]:
         if file_path.is_file() and file_path.suffix.lower() in supported_extensions:
             file_paths.append(str(file_path))
 
-    print(f"📂 Trovati {len(file_paths)} file nella cartella {docs_dir}")
+    print(f"Trovati {len(file_paths)} file nella cartella {docs_dir}")
     return file_paths
 
 

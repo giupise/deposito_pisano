@@ -1,0 +1,26 @@
+[project]
+name = "culinary_flow"
+version = "0.1.0"
+description = "culinary-flow using crewAI"
+authors = [{ name = "Your Name", email = "you@example.com" }]
+requires-python = ">=3.10,<3.14"
+dependencies = [
+    "crewai[tools]>=0.201.0,<1.0.0",
+    "langchain>=0.3.27",
+    "langchain-community>=0.3.30",
+    "langchain-openai>=0.3.33",
+    "python-dotenv>=1.1.1",
+    "qdrant-client>=1.15.1",
+]
+
+[project.scripts]
+kickoff = "culinary_flow.main:kickoff"
+run_crew = "culinary_flow.main:kickoff"
+plot = "culinary_flow.main:plot"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.crewai]
+type = "flow"

@@ -28,7 +28,7 @@ class InputValidator:
                     continue
                 
                 number = float(user_input)
-                print(f"✅ Numero valido: {number}")
+                print(f" Numero valido: {number}")
                 return number
                 
             except ValueError:
@@ -80,7 +80,7 @@ class SumFlowMain(Flow):
         
         print(f"\n🔧 PREPARAZIONE CALCOLO")
         print("-" * 30)
-        print(f"📊 Operazione: {num1} + {num2}")
+        print(f" Operazione: {num1} + {num2}")
            
         # Info crew
         crew_info = self.sum_crew.get_crew_info()
@@ -108,7 +108,7 @@ class SumFlowMain(Flow):
         num1 = inputs["number1"]
         num2 = inputs["number2"]
         
-        print(f"\n🚀 ESECUZIONE CREWAI")
+        print(f"\n ESECUZIONE CREWAI")
         print("-" * 25)
         print("CrewAI sta elaborando il calcolo...")
         
@@ -153,7 +153,7 @@ class SumFlowMain(Flow):
         num2 = inputs["number2"]
         
         print("\n" + "=" * 60)
-        print("🎯 RISULTATO FINALE")
+        print(" RISULTATO FINALE")
         print("=" * 60)
         print(f"📥 Input utente: {num1} + {num2}")
         
@@ -178,7 +178,7 @@ def kickoff():
     Entry point dell'applicazione Sum Flow avanzata.
     """
     try:
-        print("🎯 Avvio SumFlow con sistema completo")
+        print(" Avvio SumFlow con sistema completo")
         print("=" * 50)
         
         # Inizializza il flow

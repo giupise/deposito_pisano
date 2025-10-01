@@ -1,0 +1,148 @@
+# ===================================================
+# RAG_TASKS.YAML - Task per Culinary RAG Expert Crew
+# ===================================================
+
+search_knowledge_base_task:
+  description: >
+    Utilizza il sistema RAG per cercare informazioni nella knowledge base locale:
+    
+    DOMANDA: "{question}"
+    
+    Usa il tool 'document_search' per eseguire una ricerca ibrida completa che include:
+    
+    RICERCA SEMANTICA:
+    - Utilizza embeddings per trovare contenuti semanticamente correlati
+    - Identifica documenti che trattano lo stesso argomento con parole diverse
+    - Cattura relazioni concettuali e contesti impliciti
+    
+    RICERCA TESTUALE:
+    - Trova match esatti delle parole chiave nel testo
+    - Identifica riferimenti diretti e terminologia specifica
+    - Complementa la ricerca semantica con precisione lessicale
+    
+    ALGORITMO MMR:
+    - Diversifica i risultati per ridurre ridondanza
+    - Seleziona informazioni che coprono diversi aspetti dell'argomento
+    - Ottimizza il bilanciamento tra rilevanza e diversità
+    
+    ISTRUZIONI SPECIFICHE:
+    - Esegui la ricerca utilizzando ESATTAMENTE la domanda fornita
+    - Non modificare o interpretare la query di ricerca
+    - Documenta tutti i risultati trovati, anche se parziali
+    - Includi informazioni sui punteggi di rilevanza
+    - Specifica le fonti dei documenti per ogni risultato
+    - Se non trovi risultati, indica chiaramente questa condizione
+    
+    FORMATO OUTPUT RICHIESTO:
+    Riporta ESATTAMENTE l'output del tool senza modifiche o interpretazioni.
+  expected_output: >
+    Output grezzo completo del tool document_search con tutti i risultati trovati, 
+    punteggi di rilevanza e metadati delle fonti
+  agent: document_searcher
+
+analyze_search_results_task:
+  description: >
+    Analizza criticamente i risultati della ricerca RAG:
+    
+    DOMANDA ORIGINALE: "{question}"
+    RISULTATI RAG: [Output dal task precedente]
+    
+    Esegui un'analisi dettagliata su questi aspetti:
+    
+    COMPLETEZZA INFORMATIVA:
+    - I risultati rispondono completamente alla domanda posta?
+    - Mancano informazioni cruciali per una risposta esaustiva?
+    - Ci sono aspetti della domanda non coperti dai documenti?
+    - Le informazioni sono sufficienti per il livello di dettaglio richiesto?
+    
+    QUALITA' E ACCURATEZZA:
+    - I punteggi di rilevanza sono sufficientemente alti?
+    - Ci sono risultati con bassa confidenza che potrebbero essere fuorvianti?
+    - Le fonti sono credibili e aggiornate?
+    - Ci sono contraddizioni tra diversi documenti?
+    
+    COPERTURA DELL'ARGOMENTO:
+    - Tutti gli aspetti rilevanti sono rappresentati?
+    - C'è diversità sufficiente nelle informazioni trovate?
+    - Mancano prospettive importanti sull'argomento?
+    
+    UTILIZABILITA' DEI DATI:
+    - Le informazioni sono praticamente utilizzabili?
+    - Il livello di dettaglio è appropriato?
+    - Sono presenti informazioni contestuali necessarie?
+    
+    RACCOMANDAZIONI STRATEGICHE:
+    - SUFFICIENTE: Se i dati coprono ≥80% della domanda con alta qualità
+    - PARZIALE: Se i dati coprono 50-79% con qualità accettabile  
+    - INSUFFICIENTE: Se i dati coprono <50% o hanno qualità bassa
+    
+    Per ogni valutazione, fornisci:
+    - Percentuale stimata di copertura della domanda
+    - Punteggio di qualità media dei risultati
+    - Lista specifica di cosa manca (se applicabile)
+    - Raccomandazione chiara per il proseguimento
+  expected_output: >
+    Analisi strutturata con valutazione di completezza, qualità e raccomandazione 
+    specifica (SUFFICIENTE/PARZIALE/INSUFFICIENTE) per le crew successive
+  agent: information_analyzer
+
+synthesize_rag_results_task:
+  description: >
+    Organizza e struttura i risultati RAG per le crew successive:
+    
+    DOMANDA: "{question}"
+    RISULTATI RICERCA: [Output search task]
+    ANALISI QUALITA': [Output analysis task]
+    
+    Crea un report strutturato per le crew successive con:
+    
+    EXECUTIVE SUMMARY:
+    - Stato della ricerca: SUFFICIENTE/PARZIALE/INSUFFICIENTE
+    - Numero di documenti rilevanti trovati
+    - Qualità complessiva delle informazioni
+    - Raccomandazione per il prossimo step
+    
+    CONTENUTI TROVATI:
+    - Organizza le informazioni per tema/categoria
+    - Mantieni i riferimenti alle fonti originali
+    - Evidenzia i punti più rilevanti e affidabili
+    - Includi i punteggi di rilevanza
+    
+    ANALISI DEI GAP:
+    - Lista specifica di informazioni mancanti
+    - Aree che necessitano approfondimento
+    - Suggerimenti per termini di ricerca web (se necessaria)
+    
+    METADATI PER LE CREW SUCCESSIVE:
+    - Fonti consultate e loro affidabilità
+    - Livello di confidenza complessivo
+    - Flag per necessità di ricerca web
+    - Aree specifiche da investigare ulteriormente
+    
+    FORMATO FINALE:
+    Struttura il report come JSON per facilità di processamento:
+    
+    {{
+      "status": "SUFFICIENTE|PARZIALE|INSUFFICIENTE",
+      "confidence_score": float,
+      "content_found": {{
+        "summary": "sintesi delle informazioni trovate",
+        "detailed_info": ["lista", "di", "informazioni", "specifiche"],
+        "sources": ["fonte1.pdf", "fonte2.txt"]
+      }},
+      "gaps_identified": ["gap1", "gap2"],
+      "recommendations": {{
+        "web_search_needed": boolean,
+        "suggested_search_terms": ["termine1", "termine2"],
+        "next_action": "descrizione azione raccomandata"
+      }},
+      "metadata": {{
+        "total_documents": int,
+        "avg_relevance_score": float,
+        "processing_notes": "note aggiuntive"
+      }}
+    }}
+  expected_output: >
+    Report strutturato in formato JSON con tutti i risultati RAG organizzati 
+    e raccomandazioni chiare per le crew successive
+  agent: content_synthesizer

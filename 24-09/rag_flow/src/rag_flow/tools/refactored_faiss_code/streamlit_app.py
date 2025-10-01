@@ -28,7 +28,7 @@ def initialize_models():
 
 def main_menu():
     """Main menu to choose between local data and web data"""
-    st.title("🚀 RAG Assistant")
+    st.title(" RAG Assistant")
     st.markdown("Choose your preferred mode:")
     
     # Initialize models from .env
@@ -40,14 +40,14 @@ def main_menu():
                 st.session_state.llm = llm
                 st.session_state.settings = settings
                 st.session_state.models_initialized = True
-                st.success("✅ Models initialized successfully!")
+                st.success(" Models initialized successfully!")
             else:
                 st.stop()
     
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown("### 📁 Local Documents")
+        st.markdown("###  Local Documents")
         st.markdown("Use your local documents as context for chat")
         if st.button("📄 Start Local Chat", use_container_width=True):
             st.session_state.app_mode = "local"
@@ -56,14 +56,14 @@ def main_menu():
     with col2:
         st.markdown("### 🌐 Web Search")
         st.markdown("Use web content as context for chat")
-        if st.button("🔍 Start Web Search", use_container_width=True):
+        if st.button(" Start Web Search", use_container_width=True):
             st.session_state.app_mode = "web"
             st.rerun()
     
     # Show current mode if one is selected
     if "app_mode" in st.session_state:
         st.info(f"Current mode: **{st.session_state.app_mode.title()}**")
-        if st.button("🔄 Change Mode"):
+        if st.button(" Change Mode"):
             for key in ['app_mode', 'vectorstore', 'retriever', 'rag_chain', 'messages']:
                 if key in st.session_state:
                     del st.session_state[key]
@@ -72,7 +72,7 @@ def main_menu():
 
 def local_documents_page():
     """Page for local documents RAG"""
-    st.title("📁 Local Documents RAG")
+    st.title(" Local Documents RAG")
     
     # Show current configuration in sidebar
     with st.sidebar:
@@ -86,14 +86,14 @@ def local_documents_page():
             st.rerun()
         
         st.markdown("---")
-        st.markdown("### 📊 Document Information")
+        st.markdown("###  Document Information")
         if "vectorstore" in st.session_state:
-            st.success("✅ Vector store ready")
+            st.success(" Vector store ready")
         
         # Index naming
         st.markdown("### 🏷️ Index Configuration")
         index_name = st.text_input("FAISS Index Name", value="default", help="Nome per l'indice FAISS")
-        if st.button("🔄 Update Index Name"):
+        if st.button(" Update Index Name"):
             if index_name:
                 st.session_state.settings.set_persist_dir_from_query(index_name)
                 st.info(f"Index path: {st.session_state.settings.persist_dir}")
@@ -116,7 +116,7 @@ def local_documents_page():
         
         # Option to use docs folder
         if st.checkbox("Use documents from 'docs' folder"):
-            if st.button("📂 Scan docs folder"):
+            if st.button("Scan docs folder"):
                 with st.spinner("Scanning docs folder..."):
                     try:
                         file_paths = scan_docs_folder("docs")
@@ -174,7 +174,7 @@ def local_documents_page():
                         st.session_state.rag_chain = rag_chain
                         st.session_state.messages = []
                         
-                        st.success("✅ Vector store built successfully!")
+                        st.success(" Vector store built successfully!")
                         st.rerun()
                         
                     except Exception as e:
@@ -193,7 +193,7 @@ def local_documents_page():
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
                 if message["role"] == "assistant" and "metrics" in message:
-                    with st.expander("📊 RAGAS Metrics"):
+                    with st.expander(" RAGAS Metrics"):
                         st.write(message["metrics"])
         
         # User input
@@ -230,7 +230,7 @@ def local_documents_page():
                         })
                         
                         # Show metrics
-                        with st.expander("📊 RAGAS Metrics"):
+                        with st.expander(" RAGAS Metrics"):
                             st.write(metrics)
                         
                     except Exception as e:
@@ -254,13 +254,13 @@ def web_search_page():
             st.rerun()
         
         st.markdown("---")
-        st.markdown("### 🔍 Search Information")
+        st.markdown("###  Search Information")
         if "vectorstore" in st.session_state:
-            st.success("✅ Web content indexed")
+            st.success(" Web content indexed")
     
     # Web search setup
     if "vectorstore" not in st.session_state:
-        st.subheader("🔍 Web Search Setup")
+        st.subheader(" Web Search Setup")
         st.markdown("Enter a search query to find and index web content:")
         
         search_query = st.text_input("Search Query", placeholder="Enter your search terms...")
@@ -314,7 +314,7 @@ def web_search_page():
                         st.session_state.messages = []
                         st.session_state.search_query = search_query
                         
-                        st.success("✅ Web content indexed successfully!")
+                        st.success(" Web content indexed successfully!")
                         st.rerun()
                     else:
                         st.error("No content could be loaded from web search")
@@ -335,7 +335,7 @@ def web_search_page():
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
                 if message["role"] == "assistant" and "metrics" in message:
-                    with st.expander("📊 RAGAS Metrics"):
+                    with st.expander(" RAGAS Metrics"):
                         st.write(message["metrics"])
         
         # User input
@@ -372,7 +372,7 @@ def web_search_page():
                         })
                         
                         # Show metrics
-                        with st.expander("📊 RAGAS Metrics"):
+                        with st.expander(" RAGAS Metrics"):
                             st.write(metrics)
                         
                     except Exception as e:
@@ -383,7 +383,7 @@ def web_search_page():
 def main():
     st.set_page_config(
         page_title="RAG Assistant", 
-        page_icon="🚀",
+        page_icon="",
         layout="wide"
     )
     

@@ -1,0 +1,28 @@
+# ===================================================
+# TASKS.YAML - Definizione Task CrewAI
+# ===================================================
+
+classify_topic_task:
+  description: >
+    Analizza la {question} dell'utente e determina se riguarda il mondo culinario:
+    
+    -  Ricette e preparazioni culinarie
+    -  Ingredienti e loro proprietà gastronomiche
+    -  Tecniche di cottura e preparazione
+    -  Attrezzature e strumenti da cucina
+    -  Ristoranti, chef e gastronomia
+    -  Tradizioni culinarie e cultura del cibo
+    -  Nutrizione legata al cibo e alimentazione
+    -  Bevande (vini, cocktail, caffè, tè, etc.)
+    -  Conservazione e sicurezza alimentare
+    -  Presentazione e impiattamento
+    -  Costi e economia legata al food
+    -  Storia e geografia culinaria
+    
+    Una domanda è considerata NON CULINARIA se riguarda altri argomenti.
+    
+    Fornisci una classificazione binaria chiara e motivata.
+  expected_output: >
+    Classificazione binaria (True/False) 
+  agent: topic_classifier
+

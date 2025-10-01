@@ -31,7 +31,7 @@ try:
         api_base=os.getenv("AZURE_API_BASE"),
         api_version=os.getenv("AZURE_API_VERSION", "2024-02-01")
     )
-    print("✅ Connessione riuscita!")
+    print(" Connessione riuscita!")
     print(f"   Risposta: {response.choices[0].message.content}")
 except Exception as e:
     print(f"❌ Errore: {e}")
@@ -46,7 +46,7 @@ try:
         api_base=os.getenv("AZURE_API_BASE"),
         api_version="2024-02-01"
     )
-    print("✅ Funziona con API version 2024-02-01!")
+    print(" Funziona con API version 2024-02-01!")
 except Exception as e:
     print(f"❌ Errore anche con 2024-02-01")
 

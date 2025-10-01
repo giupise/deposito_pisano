@@ -1,12 +1,12 @@
 # Architettura CrewAI - RAG Flow
 
-## 📋 Panoramica
+##  Panoramica
 
 Questo progetto implementa un'architettura **CrewAI Flow** avanzata che combina orchestrazione di flussi, agenti specializzati e strumenti personalizzati per creare un sistema di domande e risposte intelligente sull'aeronautica.
 
 ---
 
-## 🌊 CrewAI Flow Architecture
+##  CrewAI Flow Architecture
 
 ### Concetti Fondamentali
 
@@ -20,7 +20,7 @@ Questo progetto implementa un'architettura **CrewAI Flow** avanzata che combina 
 
 ```python
 class AeronauticRagFlow(Flow[AeronauticRagState]):
-    @start()                    # 🚀 Entry point del flow
+    @start()                    #  Entry point del flow
     @listen(method)             # 👂 Listener per eventi
     @router(condition)          # 🔀 Routing condizionale
 ```
@@ -33,7 +33,7 @@ class AeronauticRagFlow(Flow[AeronauticRagState]):
 
 ```
 CrewAI Flow System
-├── 🌊 Flow Layer (Orchestrazione)
+├──  Flow Layer (Orchestrazione)
 │   ├── State Management (Stato condiviso)
 │   ├── Event Listeners (Reattività)
 │   └── Conditional Routing (Logica di branching)
@@ -53,7 +53,7 @@ CrewAI Flow System
 
 ---
 
-## 🌊 Flow Orchestration
+##  Flow Orchestration
 
 ### Definizione del Flow
 
@@ -72,7 +72,7 @@ class AeronauticRagState(BaseModel):
 @start()
 def starting_procedure(self):
     """
-    🚀 Entry point - inizializza il sistema
+     Entry point - inizializza il sistema
     - Setup logging
     - Configurazione iniziale
     - State initialization
@@ -177,7 +177,7 @@ class AeronauticRagCrew:
     
     @task
     def rag_response_task(self) -> Task:
-        """📋 Task di elaborazione RAG"""
+        """ Task di elaborazione RAG"""
         return Task(
             config=self.tasks_config["rag_response_task"],
             agent=self.rag_expert,
@@ -199,7 +199,7 @@ class WebCrew:
     
     @task
     def web_analysis_task(self) -> Task:
-        """📊 Task di analisi web"""
+        """ Task di analisi web"""
         return Task(
             config=self.tasks_config["web_analysis_task"],
             agent=self.web_analyst,
@@ -212,7 +212,7 @@ class DocCrew:
     
     @agent
     def doc_redactor(self) -> Agent:
-        """📝 Agente redattore documenti"""
+        """ Agente redattore documenti"""
         return Agent(
             config=self.agents_config["doc_redactor"],
             verbose=True
@@ -326,7 +326,7 @@ def rag_analysis(self):
     result = (
         AeronauticRagCrew()                    # 🏭 Istanziazione Crew
         .crew()                               # 👥 Creazione crew assembly
-        .kickoff(inputs={                     # 🚀 Esecuzione con input
+        .kickoff(inputs={                     #  Esecuzione con input
             "question": self.state.question_input,
             "response": self.state.rag_result
         })
@@ -389,7 +389,7 @@ I tool possono essere concatenati per operazioni complesse:
 def rag_system(question: str) -> str:
     docs = load_documents()           # 📚 Document loading
     embeddings = create_embeddings()  # 🔤 Vectorization  
-    results = search_similar()        # 🔍 Similarity search
+    results = search_similar()        #  Similarity search
     web_content = web_search()        # 🌐 Web enhancement
     answer = generate_response()      # 💭 LLM generation
     return answer
@@ -397,7 +397,7 @@ def rag_system(question: str) -> str:
 
 ---
 
-## 🔄 Flow Execution Patterns
+##  Flow Execution Patterns
 
 ### Event-Driven Architecture
 
@@ -421,7 +421,7 @@ def rag_system(question: str) -> str:
 ```python
 class AeronauticRagState(BaseModel):
     """Stato globale del Flow"""
-    question_input: str = ""          # 📝 Input utente
+    question_input: str = ""          #  Input utente
     rag_result: str = ""             # 🤖 Risultato elaborazione
     
     # State è accessibile da tutti i metodi del Flow
@@ -456,7 +456,7 @@ def step2(self):
 
 ---
 
-## 🚀 Esecuzione e Deployment
+##  Esecuzione e Deployment
 
 ### Setup Ambiente
 
@@ -492,7 +492,7 @@ rag_flow/
 ├── .env                    # 🔐 Variabili ambiente
 ├── pyproject.toml         # 📦 Dipendenze progetto
 └── src/rag_flow/
-    ├── main.py           # 🌊 Flow definition
+    ├── main.py           #  Flow definition
     └── crews/            # 👥 Crew configurations
         └── */config/
             ├── agents.yaml
@@ -542,14 +542,14 @@ print(result)
 
 #### **1. Logging Structure**
 ```
-🌊 Flow: AeronauticRagFlow
+ Flow: AeronauticRagFlow
 ID: [unique-flow-id]
-├── ✅ Completed: starting_procedure
-├── ✅ Completed: generate_question  
-├── ✅ Completed: question_analysis
-└── 🔄 Running: rag_analysis
-    └── 🚀 Crew: AeronauticRagCrew
-        └── 📋 Task: rag_response_task
+├──  Completed: starting_procedure
+├──  Completed: generate_question  
+├──  Completed: question_analysis
+└──  Running: rag_analysis
+    └──  Crew: AeronauticRagCrew
+        └──  Task: rag_response_task
             └── 🤖 Agent: RAG Expert Agent
                 └── 🔧 Tool: rag_system
 ```
@@ -601,7 +601,7 @@ crew = Crew(
 
 ---
 
-## 🎯 Best Practices
+##  Best Practices
 
 ### Flow Design
 
@@ -626,7 +626,7 @@ crew = Crew(
 
 ---
 
-## 🔍 RAG System Integration
+##  RAG System Integration
 
 Il sistema RAG è integrato come **tool specializzato** che fornisce:
 
@@ -639,7 +639,7 @@ Questa integrazione permette agli agenti CrewAI di accedere a conoscenza estesa 
 
 ---
 
-## 📈 Scalability & Extensions
+##  Scalability & Extensions
 
 ### Horizontal Scaling
 - Multiple crew instances

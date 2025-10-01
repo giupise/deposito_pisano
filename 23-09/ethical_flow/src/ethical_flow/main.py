@@ -41,7 +41,7 @@ def find_and_load_env():
     for location in possible_locations:
         env_file = location / ".env"
         if env_file.exists():
-            print(f"✅ Trovato .env in: {env_file}")
+            print(f" Trovato .env in: {env_file}")
             load_dotenv(env_file, override=True)
             return True
     print("❌ .env non trovato!")
@@ -63,7 +63,7 @@ if AZURE_KEY and AZURE_BASE:
     os.environ["LITELLM_API_KEY"] = AZURE_KEY
     os.environ["OPENAI_API_KEY"] = AZURE_KEY
 
-    print("✅ Azure configurato")
+    print(" Azure configurato")
     print(f"   Endpoint: {AZURE_BASE}")
     print(f"   Version : {AZURE_VERSION}")
     print(f"   Deploy  : {DEPLOYMENT}")
@@ -122,7 +122,7 @@ class EthicalFlow(Flow):
 
     @start("retry")
     def start(self):
-        print("🚀 Avvio del flusso di valutazione etica...")
+        print(" Avvio del flusso di valutazione etica...")
         return "starting"
 
     @listen(start)
@@ -137,7 +137,7 @@ class EthicalFlow(Flow):
         parsed = safe_json_extract(result)
 
         if parsed.get("is_ethical", True):  # default = True
-            print("✅ Domanda etica - proseguo verso outline_creation")
+            print(" Domanda etica - proseguo verso outline_creation")
             return "ethical_approved"
         else:
             self.state["motivation"] = parsed.get("reasoning", "N/A")
@@ -146,7 +146,7 @@ class EthicalFlow(Flow):
 
     @listen("ethical_approved")
     def outline_creation(self):
-        print("📝 Fase 2: Outline Creation - Creazione scaletta punti")
+        print(" Fase 2: Outline Creation - Creazione scaletta punti")
         outline_crew = OutlineCrew().crew()
         result = outline_crew.kickoff(inputs={"user_input": self.state['user_input']})
 
@@ -156,18 +156,18 @@ class EthicalFlow(Flow):
                 parsed = json.loads(json_match.group(0))
                 outline_sections = parsed.get("outline", [])
                 self.outline_points = [s.get("section", "") for s in outline_sections]
-                print(f"📋 Scaletta creata: {len(self.outline_points)} punti")
+                print(f" Scaletta creata: {len(self.outline_points)} punti")
                 return str(result)
         except Exception as e:
             print(f"⚠️ Errore parsing outline: {e}")
 
         lines = str(result).split("\n")
-        self.outline_points = [line.strip() for line in lines if line.strip() and not line.startswith("📝")][:5]
+        self.outline_points = [line.strip() for line in lines if line.strip() and not line.startswith("")][:5]
         return str(result)
 
     @listen("outline_creation")
     def bias_review(self):
-        print("🔍 Fase 3: Bias Review - Controllo bias e accuratezza")
+        print(" Fase 3: Bias Review - Controllo bias e accuratezza")
         bias_prompt = f"""
         Analizza questa scaletta per bias, accuratezza e rischi:
         Punti: {self.outline_points}
@@ -184,7 +184,7 @@ class EthicalFlow(Flow):
         parsed = safe_json_extract(result)
 
         if parsed.get("approved", True):  # default = True
-            print("✅ Bias Review superato - proseguo verso research")
+            print(" Bias Review superato - proseguo verso research")
         else:
             print("⚠️ Bias rilevati - proseguo comunque verso research")
 
@@ -195,7 +195,7 @@ class EthicalFlow(Flow):
         print("🔬 Fase 4: Research Phase - Ricerca dettagliata")
         research_crew = ResearchCrew().crew()
         for i, point in enumerate(self.outline_points[:3]):
-            print(f"🔍 Ricerca per punto {i+1}: {point}")
+            print(f" Ricerca per punto {i+1}: {point}")
             research_result = research_crew.kickoff(inputs={
                 "research_point": point,
                 "main_topic": self.state['user_input']
@@ -225,7 +225,7 @@ class EthicalFlow(Flow):
         with open(report_path, "w", encoding="utf-8") as f:
             f.write(report_content)
 
-        print(f"✅ Report salvato in: {report_path}")
+        print(f" Report salvato in: {report_path}")
         return f"📄 Report completato e salvato in {report_path}"
 
     @listen("invalid_output")
@@ -234,16 +234,16 @@ class EthicalFlow(Flow):
 
     @listen("retry")
     def retry_step(self):
-        domanda = input("👉 Inserisci una nuova domanda (deve essere etica): ")
+        domanda = input(" Inserisci una nuova domanda (deve essere etica): ")
         self.state["user_input"] = domanda
         return "starting"
 
 
 def kickoff():
-    print("🎯 Avvio EthicalFlow con nuovo sistema completo")
+    print(" Avvio EthicalFlow con nuovo sistema completo")
     print("=" * 50)
     flow = EthicalFlow()
-    domanda = input("👉 Inserisci la tua domanda per l'analisi completa: ")
+    domanda = input(" Inserisci la tua domanda per l'analisi completa: ")
     flow.state["user_input"] = domanda
     result = flow.kickoff()
     print("\n" + "=" * 50)
