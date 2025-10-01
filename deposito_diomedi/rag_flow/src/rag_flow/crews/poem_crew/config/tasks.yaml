@@ -1,0 +1,10 @@
+rag_response_task:
+  description: >
+    Use the RAG system to answer the {question} based on the provided context.
+    You MUST use the RAG system to retrieve relevant information and generate accurate answers.
+  expected_output: >
+    The exact result from the RAG system providing an accurate answer to the {question} based on the context.
+  agent: rag_expert
+
+
+

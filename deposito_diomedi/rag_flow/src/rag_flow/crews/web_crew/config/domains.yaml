@@ -1,0 +1,402 @@
+trusted_domains:
+  # Search Engines & Web Platforms
+  - wikipedia.org
+  - google.com
+  - google.it
+  - google.co.uk
+  - google.de
+  - google.fr
+  - google.es
+  - google.ca
+  - google.com.au
+  - docs.google.com
+  - books.google.com
+  - patents.google.com
+  - news.google.com
+  - trends.google.com
+  - scholar.google.com
+  - ai.google
+  - research.google
+  - bing.com
+  - duckduckgo.com
+  
+  # Tech Companies & Documentation
+  - microsoft.com
+  - docs.microsoft.com
+  - learn.microsoft.com
+  - technet.microsoft.com
+  - research.microsoft.com
+  - azure.microsoft.com
+  - github.com
+  - gitlab.com
+  - bitbucket.org
+  - sourceforge.net
+  - mozilla.org
+  - developer.mozilla.org
+  - apple.com
+  - developer.apple.com
+  - amazon.com
+  - aws.amazon.com
+  - docs.aws.amazon.com
+  - oracle.com
+  - docs.oracle.com
+  - ibm.com
+  - developer.ibm.com
+  - salesforce.com
+  - trailhead.salesforce.com
+  
+  # Web Standards & Development
+  - w3.org
+  - w3schools.com
+  - mdn.web.dev
+  - web.dev
+  - whatwg.org
+  - ecma-international.org
+  - iso.org
+  - ietf.org
+  - rfc-editor.org
+  
+  # Programming & Development
+  - stackoverflow.com
+  - stackoverflow.blog
+  - serverfault.com
+  - superuser.com
+  - stackexchange.com
+  - python.org
+  - docs.python.org
+  - pypi.org
+  - github.io
+  - gitlab.io
+  - readthedocs.io
+  - readthedocs.org
+  - nodejs.org
+  - npmjs.com
+  - developer.android.com
+  - developer.chrome.com
+  - firefox-source-docs.mozilla.org
+  
+  # Educational Platforms
+  - medium.com
+  - dev.to
+  - hackernoon.com
+  - towardsdatascience.com
+  - freecodecamp.org
+  - codecademy.com
+  - coursera.org
+  - edx.org
+  - udacity.com
+  - udemy.com
+  - pluralsight.com
+  - lynda.com
+  - khan.academy.org
+  - khanacademy.org
+  - brilliant.org
+  - skillshare.com
+  - masterclass.com
+  
+  # Universities & Academic Institutions
+  - mit.edu
+  - stanford.edu
+  - harvard.edu
+  - caltech.edu
+  - cmu.edu
+  - berkeley.edu
+  - cornell.edu
+  - princeton.edu
+  - yale.edu
+  - columbia.edu
+  - upenn.edu
+  - uchicago.edu
+  - northwestern.edu
+  - duke.edu
+  - vanderbilt.edu
+  - rice.edu
+  - ox.ac.uk
+  - cam.ac.uk
+  - imperial.ac.uk
+  - ucl.ac.uk
+  - kcl.ac.uk
+  - ed.ac.uk
+  - manchester.ac.uk
+  - warwick.ac.uk
+  - toronto.ca
+  - mcgill.ca
+  - ubc.ca
+  - anu.edu.au
+  - unsw.edu.au
+  - umelb.edu.au
+  - sydney.edu.au
+  
+  # Government & International Organizations
+  - gov.uk
+  - gov.ca
+  - gov.au
+  - gov.de
+  - gov.fr
+  - gov.it
+  - gobierno.es
+  - whitehouse.gov
+  - state.gov
+  - defense.gov
+  - energy.gov
+  - treasury.gov
+  - who.int
+  - un.org
+  - unesco.org
+  - unicef.org
+  - worldbank.org
+  - imf.org
+  - oecd.org
+  - europa.eu
+  - ec.europa.eu
+  - europarl.europa.eu
+  - ecb.europa.eu
+  
+  # Health & Medical
+  - nih.gov
+  - cdc.gov
+  - fda.gov
+  - mayo.edu
+  - mayoclinic.org
+  - clevelandclinic.org
+  - hopkinsmedicine.org
+  - webmd.com
+  - healthline.com
+  - medlineplus.gov
+  - ncbi.nlm.nih.gov
+  - pubmed.ncbi.nlm.nih.gov
+  - cochrane.org
+  - bmj.com
+  - thelancet.com
+  - nejm.org
+  - nature.com
+  - cell.com
+  
+  # Science & Research
+  - nasa.gov
+  - nist.gov
+  - noaa.gov
+  - usgs.gov
+  - nsf.gov
+  - energy.gov
+  - epa.gov
+  - cern.ch
+  - eso.org
+  - esa.int
+  - spacex.com
+  - arxiv.org
+  - biorxiv.org
+  - medrxiv.org
+  - ssrn.com
+  - researchgate.net
+  - academia.edu
+  - zenodo.org
+  - figshare.com
+  - dryad.org
+  - plos.org
+  - frontiersin.org
+  - mdpi.com
+  - hindawi.com
+  - springeropen.com
+  
+  # Academic Publishers
+  - ieee.org
+  - acm.org
+  - springer.com
+  - springerlink.com
+  - sciencedirect.com
+  - elsevier.com
+  - wiley.com
+  - onlinelibrary.wiley.com
+  - tandfonline.com
+  - sagepub.com
+  - jstor.org
+  - cambridge.org
+  - oxfordacademic.com
+  - sciencemag.org
+  - pnas.org
+  - royalsocietypublishing.org
+  
+  # News & Media
+  - bbc.com
+  - bbc.co.uk
+  - cnn.com
+  - reuters.com
+  - apnews.com
+  - bloomberg.com
+  - economist.com
+  - ft.com
+  - wsj.com
+  - nytimes.com
+  - washingtonpost.com
+  - theguardian.com
+  - telegraph.co.uk
+  - independent.co.uk
+  - lemonde.fr
+  - spiegel.de
+  - corriere.it
+  - repubblica.it
+  - elpais.com
+  - abc.es
+  - nationalgeographic.com
+  - scientificamerican.com
+  - newscientist.com
+  - smithsonianmag.com
+  - discovermagazine.com
+  - popularmechanics.com
+  - wired.com
+  - techcrunch.com
+  - theverge.com
+  - arstechnica.com
+  - engadget.com
+  - cnet.com
+  - zdnet.com
+  
+  # AI & Machine Learning
+  - openai.com
+  - anthropic.com
+  - deepmind.com
+  - labs.openai.com
+  - blog.openai.com
+  - research.facebook.com
+  - ai.facebook.com
+  - research.nvidia.com
+  - pytorch.org
+  - tensorflow.org
+  - keras.io
+  - scikit-learn.org
+  - huggingface.co
+  - papers.nips.cc
+  - neurips.cc
+  - icml.cc
+  - iclr.cc
+  - aaai.org
+  - ijcai.org
+  
+  # Data Science & Analytics
+  - pandas.pydata.org
+  - numpy.org
+  - scipy.org
+  - matplotlib.org
+  - seaborn.pydata.org
+  - plotly.com
+  - jupyter.org
+  - anaconda.com
+  - conda.io
+  - kaggle.com
+  - databricks.com
+  - snowflake.com
+  - tableau.com
+  - powerbi.microsoft.com
+  - r-project.org
+  - rstudio.com
+  - cran.r-project.org
+  
+  # Cloud & Infrastructure
+  - cloud.google.com
+  - firebase.google.com
+  - azure.com
+  - aws.com
+  - digitalocean.com
+  - linode.com
+  - vultr.com
+  - heroku.com
+  - netlify.com
+  - vercel.com
+  - cloudflare.com
+  - docker.com
+  - kubernetes.io
+  - openshift.com
+  - terraform.io
+  - ansible.com
+  
+  # Finance & Economics
+  - investopedia.com
+  - sec.gov
+  - federalreserve.gov
+  - imf.org
+  - worldbank.org
+  - bis.org
+  - ft.com
+  - bloomberg.com
+  - reuters.com
+  - marketwatch.com
+  - yahoo.com
+  - finance.yahoo.com
+  - morningstar.com
+  - fool.com
+  
+  # Professional Networks
+  - linkedin.com
+  - researchgate.net
+  - academia.edu
+  - orcid.org
+  - publons.com
+  - scopus.com
+  - webofscience.com
+  
+  # Encyclopedias & References
+  - britannica.com
+  - encyclopedia.com
+  - merriam-webster.com
+  - dictionary.com
+  - etymonline.com
+  - oxforddictionaries.com
+  - collinsdictionary.com
+  
+  # Legal & Standards
+  - law.cornell.edu
+  - justia.com
+  - findlaw.com
+  - westlaw.com
+  - lexisnexis.com
+  - supremecourt.gov
+  - copyright.gov
+  - uspto.gov
+  - wipo.int
+  
+  # Cultural & Educational
+  - ted.com
+  - smithsonian.edu
+  - si.edu
+  - metmuseum.org
+  - moma.org
+  - louvre.fr
+  - britishmuseum.org
+  - archive.org
+  - gutenberg.org
+  - loc.gov
+  
+  # Technology Vendors
+  - intel.com
+  - amd.com
+  - nvidia.com
+  - qualcomm.com
+  - arm.com
+  - samsung.com
+  - tsmc.com
+  - cisco.com
+  - dell.com
+  - hp.com
+  - lenovo.com
+  - vmware.com
+  - redhat.com
+  - canonical.com
+  - ubuntu.com
+  - debian.org
+  - fedoraproject.org
+  - centos.org
+  
+  # Aviation & Aerospace (for domain-specific queries)
+  - faa.gov
+  - easa.europa.eu
+  - icao.int
+  - boeing.com
+  - airbus.com
+  - lockheedmartin.com
+  - northropgrumman.com
+  - raytheon.com
+  - spacex.com
+  - blueorigin.com
+  - virgin.com
+  - aiaa.org

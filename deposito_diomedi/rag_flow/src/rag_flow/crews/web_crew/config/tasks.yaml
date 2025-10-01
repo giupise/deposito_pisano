@@ -1,0 +1,8 @@
+web_analysis_task:
+  description: >
+    Analyze the web search results and extract relevant information about {question}.
+    Summarize the key points and insights from the web search results.
+  expected_output: >
+    A concise summary of the key points and insights extracted from the web search results about {question}.
+    The summary should be clear and relevant to {question}.
+  agent: web_analyst
